@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة عبد الله علي المتقدمة للمستندات</title>
+    <title>منصة عبد الله علي المتكاملة</title>
     
+    <!-- استيراد خط كوكول المعتمد (Cairo) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     
+    <!-- مكتبات استخراج النصوص محلياً -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
         :root {
             --primary-color: #2563eb;
-            --primary-hover: #1d4ed8;
             --bg-color: #f1f5f9;
             --card-bg: #ffffff;
             --text-color: #0f172a;
@@ -49,7 +49,6 @@
             background: linear-gradient(135deg, #1e3a8a, #2563eb);
             color: white;
             border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
         header h1 { font-size: 2rem; margin-bottom: 8px; }
@@ -70,7 +69,6 @@
             color: #475569;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s ease;
         }
 
         .tab-btn.active {
@@ -117,12 +115,6 @@
             border-radius: 8px;
             background: #f8fafc;
             cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .upload-zone:hover {
-            border-color: var(--primary-color);
-            background: #f1f5f9;
         }
 
         .loading-box {
@@ -151,12 +143,12 @@
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* منطقة المعاينة والـ PDF المضمونة */
         .output-container { margin-top: 35px; display: none; }
         
+        /* الصندوق المخصص للطباعة الورقية والتصدير */
         #pdf-preview-box {
             background: white;
-            padding: 35px;
+            padding: 40px;
             border: 2px solid #cbd5e1;
             border-radius: 8px;
             margin-bottom: 25px;
@@ -169,10 +161,9 @@
             margin-bottom: 25px;
         }
 
-        .summary-paragraph {
-            margin-bottom: 18px;
+        .summary-item {
+            margin-bottom: 15px;
             text-align: justify;
-            text-indent: 15px;
         }
 
         .true-false-item {
@@ -181,6 +172,7 @@
             margin-bottom: 15px;
             border-radius: 6px;
             border: 1px solid #e2e8f0;
+            page-break-inside: avoid; /* تمنع انقسام السؤال بين صفحتين عند الطباعة */
         }
 
         .btn-download {
@@ -193,11 +185,8 @@
             font-weight: 700;
             cursor: pointer;
             width: 100%;
-            transition: background 0.2s;
             box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
         }
-
-        .btn-download:hover { background-color: #059669; }
 
         footer {
             text-align: center;
@@ -208,68 +197,96 @@
             color: #334155;
             border-top: 2px dashed #cbd5e1;
         }
+
+        /* 🖨️ إعدادات الطباعة الاحترافية لحل مشكلة الملف الفارغ وثبات خط جوجل */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #pdf-preview-box, #pdf-preview-box * {
+                visibility: visible;
+            }
+            #pdf-preview-box {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                border: none;
+                padding: 0;
+                margin: 0;
+                direction: rtl !important;
+                font-family: 'Cairo', sans-serif !important;
+            }
+            @page {
+                size: A4;
+                margin: 20mm;
+            }
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1>نظام معالجة المستندات المطور</h1>
-        <p>استخراج تلقائي دقيق للملخصات وبناء اختبارات الصح والخطأ</p>
+        <h1>نظام معالجة المستندات عالي الطاقة</h1>
+        <p>استيعاب كامل لطاقة الملف لتوليد التلخيص المضبوط واختبارات الصح والخطأ</p>
     </header>
 
     <div class="tabs">
         <button class="tab-btn active" onclick="switchTab('summary-sec', this)">القسم الأول: التلخيص المضبوط</button>
-        <button class="tab-btn" onclick="switchTab('quiz-sec', this)">القسم الثاني: أسئلة صح وخطأ</button>
+        <button class="tab-btn" onclick="switchTab('quiz-sec', this)">القسم الثاني: أسئلة صح وخطأ فقط</button>
     </div>
 
     <div id="loading" class="loading-box">
         <div class="spinner"></div>
-        <span id="loading-text">جاري معالجة مستندك وقراءته محلياً.. يرجى الانتظار ثوانٍ معدودة...</span>
+        <span id="loading-text">جاري استخراج البيانات وقراءتها بالكامل محلياً... يرجى الانتظار...</span>
     </div>
 
+    <!-- القسم الأول -->
     <div id="summary-sec" class="section-content active">
-        <h2>توليد تلخيص مضبوط ومكثف</h2>
+        <h2>توليد تلخيص مضبوط ومكثف للمادة</h2>
         <div class="form-group">
-            <label>لغة المستند المرفوع:</label>
+            <label>لغة الملف المرفوع:</label>
             <select id="lang-summary">
                 <option value="ara">اللغة العربية</option>
                 <option value="eng">اللغة الإنجليزية (English)</option>
             </select>
         </div>
         <div class="form-group">
-            <label>ارفع كتابك أو ملخصك (PDF أو صورة):</label>
+            <label>ارفع المستند (PDF أو صورة):</label>
             <div class="upload-zone" onclick="document.getElementById('file-sum').click()">
-                <p id="label-sum">اضغط هنا لرفع الملف (PDF / PNG / JPG)</p>
+                <p id="label-sum">اضغط هنا لرفع الملف الحامل للمادة العلمية</p>
                 <input type="file" id="file-sum" accept="image/*, .pdf" style="display:none" onchange="startProcessing(this, 'summary')">
             </div>
         </div>
     </div>
 
+    <!-- القسم الثاني -->
     <div id="quiz-sec" class="section-content">
-        <h2>توليد اختبار (صح أم خطأ فقط)</h2>
+        <h2>توليد أسئلة (صح وخطأ فقط) حسب طاقة المستند كاملة</h2>
         <div class="form-group">
-            <label>لغة المستند المرفوع:</label>
+            <label>لغة الملف المرفوع:</label>
             <select id="lang-quiz">
                 <option value="ara">اللغة العربية</option>
                 <option value="eng">اللغة الإنجليزية (English)</option>
             </select>
         </div>
         <div class="form-group">
-            <label>ارفع مستند الشرح لصياغة الأسئلة منه (PDF أو صورة):</label>
+            <label>ارفع المستند لتوليد الأسئلة بحسب حجمه وطاقته:</label>
             <div class="upload-zone" onclick="document.getElementById('file-quiz').click()">
-                <p id="label-quiz">اضغط هنا لرفع الملف (PDF / PNG / JPG)</p>
+                <p id="label-quiz">اضغط هنا لرفع الملف المخصص للاختبار</p>
                 <input type="file" id="file-quiz" accept="image/*, .pdf" style="display:none" onchange="startProcessing(this, 'quiz')">
             </div>
         </div>
     </div>
 
+    <!-- منطقة المعاينة والتحميل والمطبوعة -->
     <div class="output-container" id="output-container">
-        <h3 style="margin-bottom: 12px; color: #10b981; text-align: center;">✓ تم استخراج وتنسيق مستندك بنجاح</h3>
+        <h3 style="margin-bottom: 15px; color: #10b981; text-align: center;">✓ تم إعداد المستند بنجاح بخط Google</h3>
         
         <div id="pdf-preview-box"></div>
         
-        <button class="btn-download" onclick="downloadSecurePDF()">تحميل ملف الـ PDF المعدّل والمصحح</button>
+        <button class="btn-download" onclick="saveAsPDF()">حفظ وتحميل الملف بصيغة PDF المعدل</button>
     </div>
 
     <footer>
@@ -278,7 +295,6 @@
 </div>
 
 <script>
-    // إعداد مسار مكتبة قراءة ملفات الـ PDF محلياً
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
     function switchTab(sectionId, btn) {
@@ -289,7 +305,6 @@
         document.getElementById('output-container').style.display = 'none';
     }
 
-    // بدء القراءة الذكية للمستندات
     function startProcessing(input, mode) {
         if (input.files.length === 0) return;
         const file = input.files[0];
@@ -310,22 +325,21 @@
                         pagesPromises.push(pdf.getPage(i).then(page => page.getTextContent().then(text => text.items.map(item => item.str).join(' '))));
                     }
                     Promise.all(pagesPromises).then(texts => {
-                        buildContent(texts.join('\n'), mode, lang, file.name);
+                        buildData(texts.join('\n'), mode, lang, file.name);
                     });
                 }).catch(err => {
-                    alert("عذراً، فشل قراءة نص ملف الـ PDF. تأكد أنه ملف نصي وليس صورة ممسوحة.");
+                    alert("خطأ في قراءة ملف الـ PDF.");
                     toggleLoading(false);
                 });
             };
             fileReader.readAsArrayBuffer(file);
         } else {
-            // معالجة الصور عبر OCR
             Tesseract.recognize(file, lang)
             .then(({ data: { text } }) => {
-                buildContent(text, mode, lang, file.name);
+                buildData(text, mode, lang, file.name);
             })
             .catch(err => {
-                alert("تعذر قراءة الكلمات من الصورة، يرجى رفع صورة أكثر وضوحاً.");
+                alert("خطأ في معالجة الصورة.");
                 toggleLoading(false);
             });
         }
@@ -336,11 +350,10 @@
         if(show) document.getElementById('output-container').style.display = 'none';
     }
 
-    // بناء وتنسيق المخرجات النهائية وضبط التلخيص والأسئلة (صح وخطأ)
-    function buildContent(rawText, mode, lang, filename) {
+    function buildData(rawText, mode, lang, filename) {
         toggleLoading(false);
         if(!rawText.trim()) {
-            alert("الملف فارغ أو لم نتمكن من استخراج كلمات مقروءة منه.");
+            alert("لم يتم العثور على نصوص كافية بمعالجة هذا الملف.");
             return;
         }
 
@@ -348,110 +361,95 @@
         previewBox.style.direction = lang === 'ara' ? 'rtl' : 'ltr';
         previewBox.style.textAlign = lang === 'ara' ? 'right' : 'left';
 
-        // تقسيم النص وتصفيته للحصول على جمل مضبوطة ومفيدة
-        let sentences = rawText.split(/[.؟?!\n]/).map(s => s.trim()).filter(s => s.length > 15);
+        // تصفية الجمل والمفاهيم
+        let sentences = rawText.split(/[.؟?!\n]/).map(s => s.trim()).filter(s => s.length > 20);
         if(sentences.length === 0) sentences = [rawText.trim()];
 
-        let finalHtml = "";
+        let htmlResult = "";
 
         if (mode === 'summary') {
-            // 1. قسم التلخيص المضبوط والمنظم
-            finalHtml = `
+            // صياغة التلخيص المضبوط
+            htmlResult = `
                 <div class="pdf-header">
-                    <h2 style="border:none; padding:0; margin:0; color:#1e3a8a; font-size:1.7rem;">الملخص المضبوط للمستند: ${filename}</h2>
-                    <p style="font-size:0.95rem; color:#64748b; margin-top:5px;">صياغة وتنسيق أكاديمي محكم بخط Cairo</p>
+                    <h2 style="border:none; padding:0; margin:0; color:#1e3a8a; font-size:1.8rem;">التلخيص المضبوط الشامل</h2>
+                    <p style="font-size:1rem; color:#475569; margin-top:5px;">اسم الملف الأصلي: ${filename}</p>
                 </div>
-                <div style="font-size: 1.15rem; color: #1e293b; line-height: 1.9;">
-                    <h3 style="color:#2563eb; margin-bottom:12px;">أولاً: الخلاصة التنفيذية والأفكار الرئيسية:</h3>
+                <div style="font-size: 1.2rem; color: #0f172a; line-height: 2;">
+                    <h3 style="color:#2563eb; margin-bottom:15px; font-size:1.3rem;">📋 أبرز المحاور والركائز المستخرجة:</h3>
             `;
-            
-            // اختيار أهم الجمل وتنسيقها كفقرات تلخيصية مكثفة
-            let limit = Math.min(sentences.length, 6);
-            for(let i=0; i<limit; i++) {
-                finalHtml += `<p class="summary-paragraph">📌 <b>فكرة جوهرية (${i+1}):</b> ${sentences[i]}.</p>`;
+
+            // استخراج التلخيص بالاعتماد على حجم وطاقة الجمل المستخرجة كاملة
+            let step = Math.max(1, Math.floor(sentences.length / 6));
+            let count = 1;
+            for(let i = 0; i < sentences.length && count <= 7; i += step) {
+                htmlResult += `
+                    <div class="summary-item">
+                        <b>المحور الجوهري (${count}):</b> ${sentences[i]}.
+                    </div>
+                `;
+                count++;
             }
 
-            finalHtml += `
+            htmlResult += `
                 </div>
-                <div style="text-align: left; font-weight: bold; margin-top: 60px; border-top: 2px dashed #94a3b8; padding-top: 12px; font-size:1rem; color:#334155;">
+                <div style="text-align: left; font-weight: bold; margin-top: 80px; border-top: 2px dashed #0f172a; padding-top: 15px; font-size:1rem; color:#0f172a;">
                     تم إعداده بواسطة عبد الله علي /D
                 </div>
             `;
         } else {
-            // 2. قسم الأسئلة: صح وخطأ فقط
-            finalHtml = `
+            // صياغة أسئلة صح وخطأ فقط بناءً على طاقة واستيعاب الملف
+            htmlResult = `
                 <div class="pdf-header">
-                    <h2 style="border:none; padding:0; margin:0; color:#1e3a8a; font-size:1.7rem;">اختبار الصح والخطأ لملف: ${filename}</h2>
-                    <p style="font-size:0.95rem; color:#64748b; margin-top:5px;">أسئلة تقييمية بنمط (صح أم خطأ) مأخوذة من صلب المحتوى</p>
+                    <h2 style="border:none; padding:0; margin:0; color:#1e3a8a; font-size:1.8rem;">اختبار التقييم الذاتي (صح / خطأ)</h2>
+                    <p style="font-size:1rem; color:#475569; margin-top:5px;">تم إنشاؤه بناءً على طاقة ملف: ${filename}</p>
                 </div>
-                <div style="font-size: 1.1rem;">
+                <div style="font-size: 1.15rem;">
             `;
 
-            let limit = Math.min(sentences.length, 5);
-            // في حال كانت الجمل المستخرجة قليلة جداً
-            if (limit < 3) {
-                sentences.push("تعتبر المعلومات والبيانات الواردة في هذا الفصل ركيزة أساسية للفهم المباشر والمراجعة الدراسية المعتمدة.");
-                sentences.push("تتغير النتائج والقوانين المطروحة بتغير العوامل والمؤثرات الخارجية والبيئية المحيطة بالتجربة.");
-                limit = sentences.length;
-            }
+            // توزيع الأسئلة بشكل عادل على كامل طاقة ونص الملف (بداية، وسط، نهاية)
+            let totalQuestions = Math.min(sentences.length, 10); // توليد حتى 10 أسئلة شاملة للملف
+            let step = Math.max(1, Math.floor(sentences.length / totalQuestions));
+            let qCount = 1;
 
-            for(let i=0; i<limit; i++) {
+            for (let i = 0; i < sentences.length && qCount <= totalQuestions; i += step) {
                 let textSnippet = sentences[i];
-                if(textSnippet.length > 120) textSnippet = textSnippet.substring(0, 120) + "...";
+                if(textSnippet.length > 130) textSnippet = textSnippet.substring(0, 130) + "...";
 
                 if (lang === 'ara') {
-                    finalHtml += `
+                    htmlResult += `
                         <div class="true-false-item">
-                            <p><b>س ${i+1}:</b> العبارة التي تنص على أن "${textSnippet}" هي عبارة صحيحة تماماً من الناحية العلمية والسياقية.</p>
-                            <p style="margin-top: 8px; color: #475569; font-weight: bold;">الخيارات: &nbsp;&nbsp;&nbsp;&nbsp; ( &nbsp;&nbsp; ) صـح &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ( &nbsp;&nbsp; ) خـطأ</p>
+                            <p><b>س ${qCount}:</b> تشير المادة العلمية إلى أن "${textSnippet}" هي حقيقة دراسية ثابتة.</p>
+                            <p style="margin-top: 10px; color: #334155; font-weight: bold;">الخيارات: &nbsp;&nbsp;&nbsp;&nbsp; ( &nbsp;&nbsp; ) صـح &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ( &nbsp;&nbsp; ) خـطأ</p>
                         </div>
                     `;
                 } else {
-                    finalHtml += `
+                    htmlResult += `
                         <div class="true-false-item">
-                            <p><b>Q ${i+1}:</b> The statement indicating that: "${textSnippet}" is entirely correct according to the context.</p>
-                            <p style="margin-top: 8px; color: #475569; font-weight: bold;">Options: &nbsp;&nbsp;&nbsp;&nbsp; ( &nbsp;&nbsp; ) True &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ( &nbsp;&nbsp; ) False</p>
+                            <p><b>Q ${qCount}:</b> The core text confirms that: "${textSnippet}" is contextually accurate.</p>
+                            <p style="margin-top: 10px; color: #334155; font-weight: bold;">Options: &nbsp;&nbsp;&nbsp;&nbsp; ( &nbsp;&nbsp; ) True &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ( &nbsp;&nbsp; ) False</p>
                         </div>
                     `;
                 }
+                qCount++;
             }
 
-            finalHtml += `
+            htmlResult += `
                 </div>
-                <div style="text-align: left; font-weight: bold; margin-top: 60px; border-top: 2px dashed #94a3b8; padding-top: 12px; font-size:1rem; color:#334155;">
+                <div style="text-align: left; font-weight: bold; margin-top: 80px; border-top: 2px dashed #0f172a; padding-top: 15px; font-size:1rem; color:#0f172a;">
                     تم إعداده بواسطة عبد الله علي /D
                 </div>
             `;
         }
 
-        previewBox.innerHTML = finalHtml;
-        // إظهار صندوق النتائج
+        previewBox.innerHTML = htmlResult;
         document.getElementById('output-container').style.display = 'block';
         window.scrollTo({ top: document.getElementById('output-container').offsetTop, behavior: 'smooth' });
     }
 
-    // دالة تحميل الـ PDF الآمنة والمحدثة لحل مشكلة الملف الفارغ
-    function downloadSecurePDF() {
-        const element = document.getElementById('pdf-preview-box');
-        
-        // إعدادات تمنع توليد ملف أبيض وتجبر المتصفح على انتظار الخطوط والتنسيقات الكاملة
-        const opt = {
-            margin:       15,
-            filename:     'مستند_معدل_عبدالله_علي.pdf',
-            image:        { type: 'jpeg', quality: 1.0 },
-            html2canvas:  { 
-                scale: 2, 
-                useCORS: true, 
-                logging: false,
-                letterRendering: true
-            },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-
-        // تأخير تشغيل التحميل 500 ملي ثانية للتأكد من زوال أي مشكلة تعليق أو فراغ في الـ Canvas
-        setTimeout(() => {
-            html2pdf().set(opt).from(element).save();
-        }, 500);
+    // 🎯 الدالة السحرية والمضمونة لحفظ الـ PDF بخط كوكول بدون ملفات فارغة
+    function saveAsPDF() {
+        // استدعاء نافذة الطباعة والحفظ الأصلية للمتصفح والتي تضمن معالجة خطوط قوقل بالكامل وبدقة عالية
+        window.print();
     }
 </script>
 
