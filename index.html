@@ -3,395 +3,497 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة الإحصاء الاحترافية - لوحة التحكم</title>
+    <title>منصة الأشخاص - لوحة التحكم</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Tajawal:wght@400;500;700;900&display=swap');
+        body { font-family: 'Tajawal', 'Plus Jakarta Sans', sans-serif; background-color: #f4f7fe; }
+        .sidebar-item.active { background-color: #eef2ff; color: #4f46e5; border-right: 4px solid #4f46e5; }
+        .dark-mode { background-color: #0b1329 !important; color: #f8fafc; }
+        .dark-card { background-color: #111c44 !important; border-color: #1b254b !important; color: #fff !important; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen">
+<body class="text-slate-700 min-h-screen transition-colors duration-300" id="body-layout">
 
-    <div id="login-page" class="flex items-center justify-center min-h-screen px-4">
-        <div class="bg-white p-8 rounded-2xl shadow-xl border border-slate-100 w-full max-w-md">
+    <div id="login-page" class="flex items-center justify-center min-h-screen px-4 bg-[#f4f7fe]">
+        <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 w-full max-w-md">
             <div class="text-center mb-8">
-                <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl mb-4 text-2xl shadow-sm">🔐</div>
-                <h1 class="text-2xl font-bold text-slate-900">تسجيل دخول المسؤول</h1>
-                <p class="text-sm text-slate-500 mt-1">الرجاء إدخال بيانات الاعتماد للوصول للوحة التحكم</p>
+                <div class="inline-flex items-center justify-center w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl mb-3 text-xl font-bold">👤</div>
+                <h1 class="text-2xl font-bold text-slate-900">منصة الأشخاص</h1>
+                <p class="text-sm text-slate-400 mt-1">تسجيل دخول لوحة التحكم</p>
             </div>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">اسم المستخدم</label>
-                    <input type="text" id="username" placeholder="admin" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50">
+                    <label class="block text-xs font-bold text-slate-600 mb-1">اسم المستخدم</label>
+                    <input type="text" id="username" value="admin" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">كلمة المرور</label>
-                    <input type="password" id="password" placeholder="admin123" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50">
+                    <label class="block text-xs font-bold text-slate-600 mb-1">كلمة المرور</label>
+                    <input type="password" id="password" value="admin123" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50">
                 </div>
-                <div id="login-error" class="text-red-500 text-xs font-medium hidden">❌ اسم المستخدم أو كلمة المرور غير صحيحة!</div>
-                <button onclick="handleLogin()" class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-medium py-3 rounded-xl shadow-md cursor-pointer">تسجيل الدخول</button>
+                <div id="login-error" class="text-rose-500 text-xs hidden">❌ خطأ في البيانات المطلوبة!</div>
+                <button onclick="handleLogin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-xl shadow-lg shadow-indigo-100 transition cursor-pointer">دخول</button>
             </div>
         </div>
     </div>
 
-    <div id="admin-dashboard" class="hidden p-4 md:p-8 max-w-7xl mx-auto">
+    <div id="admin-dashboard" class="hidden flex min-h-screen">
         
-        <header class="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mb-8 gap-4">
-            <div class="flex items-center gap-4 text-center md:text-right">
-                <div class="w-12 h-12 bg-indigo-600 text-white flex items-center justify-center rounded-xl font-bold text-xl shadow-md">💻</div>
-                <div>
-                    <h2 class="text-xl font-bold text-slate-900">لوحة الإدارة والإحصاء المتطورة</h2>
-                    <p class="text-xs text-emerald-600 font-medium">● متصل الآن كـ مسؤول النظام</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-4">
-                <div class="bg-indigo-50/60 border border-indigo-100 px-6 py-3 rounded-xl text-center min-w-[140px]">
-                    <span class="block text-xs text-indigo-600 font-semibold mb-0.5">إجمالي الأشخاص</span>
-                    <span id="total-count" class="text-2xl font-black text-indigo-900">0</span>
-                </div>
-                <button onclick="handleLogout()" class="bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 px-4 py-2.5 rounded-xl text-sm font-medium cursor-pointer">تسجيل الخروج ↩️</button>
-            </div>
-        </header>
-
-        <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 mb-8">
-            <h3 class="text-sm font-bold text-slate-700 mb-3">🔍 نظام البحث الفوري عن الأشخاص</h3>
-            <input type="text" id="search-input" oninput="searchPeople()" placeholder="اكتب اسم الشخص أو رقم الهاتف للبحث الفوري..." class="w-full px-5 py-3.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50 text-base">
-            <div id="search-results" class="hidden mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200"></div>
-        </section>
-
-        <section class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 lg:col-span-1">
-                <h3 class="text-base font-bold text-slate-900 mb-4">📂 إدارة الأقسام</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-500 mb-1">اسم القسم الجديد</label>
-                        <input type="text" id="dept-name-input" placeholder="مثال: التقنية، الحسابات" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <aside id="sidebar-panel" class="w-64 bg-white border-l border-slate-100 flex flex-col justify-between p-4 shrink-0 transition-colors duration-300">
+            <div>
+                <div class="flex items-center justify-between px-2 py-4 mb-6">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">📊</div>
+                        <span class="font-bold text-lg text-slate-900 id-title">منصة الأشخاص</span>
                     </div>
-                    <button onclick="addDepartment()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium py-2.5 rounded-xl cursor-pointer">إضافة قسم جديد +</button>
+                    <button class="text-slate-400 hover:text-slate-600 lg:hidden">☰</button>
                 </div>
-            </div>
-
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 lg:col-span-2">
-                <h3 id="form-title" class="text-base font-bold text-slate-900 mb-4">👤 استمارة تسجيل شخص جديد</h3>
-                <input type="hidden" id="edit-mode" value="false">
-                <input type="hidden" id="edit-dept" value="">
-                <input type="hidden" id="edit-index" value="">
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-500 mb-1">اسم الشخص الكامل</label>
-                        <input type="text" id="person-name-input" placeholder="أدخل الاسم الكامل" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-500 mb-1">رقم الهاتف</label>
-                        <input type="tel" id="person-phone-input" placeholder="رقم الهاتف" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-right">
-                    </div>
+                <nav class="space-y-1">
+                    <a href="#" onclick="switchTab('dashboard')" class="sidebar-item active flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-500 hover:bg-slate-50 transition">
+                        <span>🏠</span> لوحة التحكم
+                    </a>
+                    <a href="#" onclick="switchTab('add-person')" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-500 hover:bg-slate-50 transition">
+                        <span>➕</span> إضافة شخص / مجموعة
+                    </a>
+                    <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-500 hover:bg-slate-50 transition">
+                        <span>👥</span> الأشخاص
+                    </a>
+                    <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-500 hover:bg-slate-50 transition">
+                        <span>🗂️</span> المجموعات
+                    </a>
+                    <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-500 hover:bg-slate-50 transition">
+                        <span>📈</span> التقارير
+                    </a>
+                    <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-500 hover:bg-slate-50 transition">
+                        <span>⚙️</span> الإعدادات
+                    </a>
+                </nav>
+            </div>
+
+            <button onclick="handleLogout()" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-600 font-medium py-3 rounded-xl text-sm flex items-center justify-center gap-2 transition cursor-pointer">
+                <span>↩️</span> تسجيل الخروج
+            </button>
+        </aside>
+
+        <main class="flex-1 p-6 overflow-y-auto">
+            
+            <div class="flex justify-between items-center mb-8">
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleDarkMode()" class="w-10 h-10 bg-white border border-slate-100 rounded-xl flex items-center justify-center hover:bg-slate-50 shadow-sm cursor-pointer" title="تغيير المظهر">🌙</button>
+                    <button class="w-10 h-10 bg-white border border-slate-100 rounded-xl flex items-center justify-center hover:bg-slate-50 shadow-sm relative">
+                        <span>🔔</span>
+                        <span class="w-2 h-2 bg-rose-500 rounded-full absolute top-2 right-2"></span>
+                    </button>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-500 mb-1">معلومات إضافية / الوظيفة</label>
-                        <input type="text" id="person-info-input" placeholder="الوظيفة أو ملاحظات" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-500 mb-1">صورة الشخص (من المعرض)</label>
-                        <input type="file" id="person-img-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
-                        <input type="hidden" id="person-img-base64" value="">
-                    </div>
-                </div>
-                <div class="flex flex-col sm:flex-row gap-3">
-                    <div class="flex-1" id="dept-select-container">
-                        <select id="dept-select" class="w-full px-4 py-2.5 border border-slate-200 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <option value="">-- حدد القسم التابع له الشخص --</option>
-                        </select>
-                    </div>
-                    <button id="submit-btn" onclick="savePerson()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-8 py-2.5 rounded-xl shadow-md cursor-pointer whitespace-nowrap">تأكيد الإدخال</button>
-                    <button id="cancel-edit-btn" onclick="resetForm()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium px-4 py-2.5 rounded-xl cursor-pointer hidden">إلغاء التعديل</button>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-sm shadow-md">A</div>
                 </div>
             </div>
-        </section>
 
-        <h3 class="text-lg font-bold text-slate-900 mb-4">📊 توزيع الأقسام والأعضاء</h3>
-        <div id="departments-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            <div id="tab-dashboard" class="tab-content space-y-6">
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between card-el">
+                        <div>
+                            <p class="text-xs font-medium text-slate-400">الأشخاص النشطين</p>
+                            <h3 class="text-2xl font-bold text-slate-800 mt-1">356</h3>
+                            <span class="text-[11px] text-emerald-500 font-medium mt-1 inline-block">↗ 7%+ <span class="text-slate-400">من الشهر الماضي</span></span>
+                        </div>
+                        <div class="w-10 h-10 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center text-lg">👤</div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between card-el">
+                        <div>
+                            <p class="text-xs font-medium text-slate-400">إجمالي المشاهدات</p>
+                            <h3 class="text-2xl font-bold text-slate-800 mt-1">8,652</h3>
+                            <span class="text-[11px] text-emerald-500 font-medium mt-1 inline-block">↗ 18%+ <span class="text-slate-400">من الشهر الماضي</span></span>
+                        </div>
+                        <div class="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-lg">📊</div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between card-el">
+                        <div>
+                            <p class="text-xs font-medium text-slate-400">إجمالي المجموعات</p>
+                            <h3 id="stat-depts" class="text-2xl font-bold text-slate-800 mt-1">4</h3>
+                            <span class="text-[11px] text-emerald-500 font-medium mt-1 inline-block">↗ 3+ <span class="text-slate-400">من الشهر الماضي</span></span>
+                        </div>
+                        <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-lg">🗂️</div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between card-el">
+                        <div>
+                            <p class="text-xs font-medium text-slate-400">إجمالي الأشخاص</p>
+                            <h3 id="stat-total" class="text-2xl font-bold text-slate-800 mt-1">5</h3>
+                            <span class="text-[11px] text-emerald-500 font-medium mt-1 inline-block">↗ 12%+ <span class="text-slate-400">من الشهر الماضي</span></span>
+                        </div>
+                        <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-lg">👥</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 lg:col-span-2 flex flex-col justify-between card-el">
+                        <div>
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-50 gap-3 mb-4">
+                                <h3 class="font-bold text-base text-slate-800">قائمة الأشخاص</h3>
+                                <div class="flex items-center gap-2">
+                                    <div class="relative">
+                                        <input type="text" id="table-search" oninput="renderTable()" placeholder="بحث عن شخص..." class="pl-3 pr-8 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 bg-slate-50/50 w-48">
+                                        <span class="absolute right-2.5 top-2 text-xs text-slate-400">🔍</span>
+                                    </div>
+                                    <button onclick="switchTab('add-person')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1 cursor-pointer">+ إضافة شخص</button>
+                                </div>
+                            </div>
+
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-right text-xs">
+                                    <thead>
+                                        <tr class="text-slate-400 font-medium border-b border-slate-50">
+                                            <th class="pb-3 font-semibold">الصورة</th>
+                                            <th class="pb-3 font-semibold">الاسم</th>
+                                            <th class="pb-3 font-semibold">البريد الإلكتروني / الهاتف</th>
+                                            <th class="pb-3 font-semibold">المجموعة</th>
+                                            <th class="pb-3 font-semibold">تاريخ الإضافة</th>
+                                            <th class="pb-3 font-semibold text-center">الإجراءات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="table-body" class="divide-y divide-slate-50 text-slate-700">
+                                        </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-4 border-t border-slate-50 mt-4 text-xs text-slate-400">
+                            <button class="hover:text-slate-600">السابق</button>
+                            <div class="flex items-center gap-1">
+                                <span class="w-6 h-6 rounded bg-indigo-600 text-white flex items-center justify-center font-medium">1</span>
+                                <span class="w-6 h-6 rounded hover:bg-slate-50 flex items-center justify-center cursor-pointer">2</span>
+                                <span class="w-6 h-6 rounded hover:bg-slate-50 flex items-center justify-center cursor-pointer">3</span>
+                            </div>
+                            <button class="hover:text-slate-600">التالي</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 lg:col-span-1 flex flex-col justify-between card-el">
+                        <div>
+                            <h3 class="font-bold text-base text-slate-800 pb-4 border-b border-slate-50 mb-6">إحصائيات سريعة</h3>
+                            <div class="w-44 h-44 mx-auto relative mb-6">
+                                <canvas id="chart-donut"></canvas>
+                            </div>
+                        </div>
+                        <div id="chart-legend" class="space-y-2 text-xs">
+                            </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div id="tab-add-person" class="tab-content hidden space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 card-el">
+                        <h3 class="font-bold text-base text-slate-800 mb-4">➕ إضافة أو مسح مجموعة</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1">اسم المجموعة</label>
+                                <input type="text" id="dept-input" placeholder="مثال: المطورين، التصميم" class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <button onclick="addDept()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl text-xs shadow-md transition cursor-pointer">إنشاء مجموعة</button>
+                            
+                            <div class="pt-4 border-t border-slate-100">
+                                <label class="block text-xs font-bold text-slate-500 mb-2">المجموعات الحالية (اضغط للحذف 🗑️)</label>
+                                <div id="depts-list" class="flex flex-wrap gap-1.5"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 lg:col-span-2 card-el">
+                        <h3 id="form-title" class="font-bold text-base text-slate-800 mb-4">👤 تسجيل شخص جديد بالنظام</h3>
+                        <input type="hidden" id="edit-id" value="">
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1">الاسم الكامل</label>
+                                <input type="text" id="p-name" placeholder="أدخل الاسم" class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1">البريد الإلكتروني أو الهاتف</label>
+                                <input type="text" id="p-contact" placeholder="example@mail.com" class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1">اختر المجموعة</label>
+                                <select id="p-dept" class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"></select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1">صورة الشخص (من المعرض)</label>
+                                <input type="file" id="p-file" accept="image/*" class="w-full text-xs text-slate-500 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
+                                <input type="hidden" id="p-base64">
+                            </div>
+                        </div>
+                        <div class="flex gap-2 justify-end">
+                            <button id="cancel-btn" onclick="clearForm()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium px-5 py-2.5 rounded-xl text-xs transition hidden cursor-pointer">إلغاء</button>
+                            <button id="save-btn" onclick="savePerson()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-6 py-2.5 rounded-xl text-xs shadow-md transition cursor-pointer">حفظ وتأكيد</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
     </div>
 
-    <div id="pdf-template" class="hidden">
-        <div style="font-family: 'Segoe UI', Tahoma, sans-serif; direction: rtl; padding: 30px; background: #fff; border: 2px solid #4f46e5; border-radius: 20px; max-w-sm: 400px; margin: auto; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-            <div style="background: linear-gradient(135deg, #4f46e5, #3730a3); color: #fff; padding: 15px; margin: -30px -30px 25px -30px; border-top-left-radius: 18px; border-top-right-radius: 18px;">
-                <h2 style="margin: 0; font-size: 20px;">بطاقة تعريفية رسمية</h2>
-                <p id="pdf-dept" style="margin: 5px 0 0 0; font-size: 13px; color: #e0e7ff;"></p>
+    <div id="pdf-container" class="hidden">
+        <div style="direction: rtl; font-family: 'Tajawal', sans-serif; padding: 25px; background: white; border: 1px solid #e2e8f0; border-radius: 20px; text-align: center; max-width: 320px; margin: auto;">
+            <div style="width: 70px; height: 70px; background: #eef2ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto; color: #4f46e5; font-size: 24px;">📊</div>
+            <img id="pdf-avatar" src="" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #4f46e5; margin: 0 auto 15px auto;">
+            <h2 id="pdf-name" style="font-size: 18px; font-bold: true; margin: 0 0 5px 0; color: #1e293b;"></h2>
+            <p id="pdf-contact" style="font-size: 13px; color: #4f46e5; margin: 0 0 15px 0; font-family: sans-serif;"></p>
+            <div style="background: #f8fafc; padding: 8px 15px; border-radius: 10px; font-size: 12px; color: #64748b; display: inline-block;">
+                المجموعة: <span id="pdf-group" style="color: #0f172a; font-weight: bold;"></span>
             </div>
-            <img id="pdf-img" src="" style="width: 130px; height: 130px; border-radius: 50%; object-cover: true; border: 4px solid #f0fdf4; margin-bottom: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-            <h3 id="pdf-name" style="margin: 0 0 8px 0; color: #111827; font-size: 22px; font-weight: bold;"></h3>
-            <p id="pdf-phone" style="margin: 0 0 8px 0; color: #4f46e5; font-size: 15px; font-weight: 600; direction: ltr;"></p>
-            <p id="pdf-info" style="margin: 0; color: #6b7280; font-size: 14px; background: #f9fafb; padding: 10px; border-radius: 10px; border: 1px solid #f3f4f6;"></p>
-            <div style="margin-top: 25px; border-top: 1px solid #e5e7eb; padding-top: 10px; font-size: 11px; color: #9ca3af;">منصة إحصاء الأشخاص الإدارية</div>
+            <div style="margin-top: 25px; font-size: 10px; color: #94a3b8; border-top: 1px solid #f1f5f9; padding-top: 10px;">بطاقة موثقة تلقائياً من نظام إدارة الأشخاص</div>
         </div>
     </div>
 
     <script>
-        const ADMIN_USER = "admin";
-        const ADMIN_PASS = "admin123";
+        // داتا افتراضية مطابقة تماماً للموجودة في الصورة المرفقة
+        let groups = ["المطورين", "التصميم", "الإدارة", "التسويق"];
+        let people = [
+            { id: 1, name: "أحمد محمد", contact: "ahmed@example.com", group: "المطورين", date: "2024-05-20", img: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&h=80&fit=crop" },
+            { id: 2, name: "سارة علي", contact: "sara@example.com", group: "التصميم", date: "2024-05-19", img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop" },
+            { id: 3, name: "محمد حسن", contact: "mohammed@example.com", group: "الإدارة", date: "2024-05-18", img: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=80&h=80&fit=crop" },
+            { id: 4, name: "فاطمة حسين", contact: "fatima@example.com", group: "التسويق", date: "2024-05-17", img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop" },
+            { id: 5, name: "علي رضوان", contact: "ali@example.com", group: "المطورين", date: "2024-05-16", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop" }
+        ];
 
-        let data = {}; // قاعدة البيانات تبدأ فارغة تماماً
-        const defaultAvatar = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80";
+        const defaultAvatar = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop";
+        let donutChart = null;
 
-        // معالجة اختيار ملف الصورة وتحويله لـ Base64 لحفظه محلياً في الصفحة
-        document.getElementById('person-img-file').addEventListener('change', function(e) {
+        // معالجة قراءة الصورة المرفوعة محلياً
+        document.getElementById('p-file').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(event) {
-                    document.getElementById('person-img-base64').value = event.target.result;
-                };
+                reader.onload = function(event) { document.getElementById('p-base64').value = event.target.result; };
                 reader.readAsDataURL(file);
             }
         });
 
         function handleLogin() {
-            const user = document.getElementById('username').value.trim();
-            const pass = document.getElementById('password').value.trim();
-            if (user === ADMIN_USER && pass === ADMIN_PASS) {
+            if (document.getElementById('username').value === "admin" && document.getElementById('password').value === "admin123") {
                 document.getElementById('login-page').classList.add('hidden');
                 document.getElementById('admin-dashboard').classList.remove('hidden');
-                updateUI();
+                initSystem();
             } else {
                 document.getElementById('login-error').classList.remove('hidden');
             }
         }
 
         function handleLogout() {
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-            document.getElementById('admin-dashboard').classList.add('hidden');
             document.getElementById('login-page').classList.remove('hidden');
+            document.getElementById('admin-dashboard').classList.add('hidden');
         }
 
-        function updateUI() {
-            const container = document.getElementById('departments-container');
-            const select = document.getElementById('dept-select');
-            const totalCountSpan = document.getElementById('total-count');
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
             
-            container.innerHTML = '';
-            select.innerHTML = '<option value="">-- حدد القسم التابع له الشخص --</option>';
-            let totalPersons = 0;
-
-            if (Object.keys(data).length === 0) {
-                container.innerHTML = `
-                    <div class="col-span-full bg-white text-center p-12 rounded-2xl border border-dashed border-slate-300">
-                        <span class="text-4xl">📂</span>
-                        <h4 class="text-lg font-bold text-slate-700 mt-3">المنصة فارغة وجاهزة للعمل</h4>
-                        <p class="text-sm text-slate-400 mt-1">ابدأ بإضافة قسم أولاً لتتمكن من ملء بيانات الأشخاص.</p>
-                    </div>`;
-                totalCountSpan.textContent = 0;
-                return;
-            }
-
-            for (const [deptName, people] of Object.entries(data)) {
-                totalPersons += people.length;
-
-                const option = document.createElement('option');
-                option.value = deptName;
-                option.textContent = deptName;
-                select.appendChild(option);
-
-                const card = document.createElement('div');
-                card.className = "bg-white rounded-2xl shadow-sm border border-slate-100 p-5 flex flex-col justify-between";
-                
-                let peopleListHTML = people.map((p, index) => `
-                    <div class="flex flex-col gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100 hover:bg-slate-100/70 transition">
-                        <div class="flex items-center gap-3">
-                            <img src="${p.img || defaultAvatar}" class="w-12 h-12 rounded-xl object-cover border border-slate-200 bg-white">
-                            <div class="flex-1">
-                                <h4 class="font-bold text-slate-800 text-sm">${p.name}</h4>
-                                <p class="text-[11px] text-indigo-600 font-medium">${p.phone}</p>
-                                ${p.info ? `<p class="text-[11px] text-slate-400 mt-0.5">${p.info}</p>` : ''}
-                            </div>
-                        </div>
-                        <div class="flex gap-1.5 border-t border-slate-200/60 pt-2 justify-end">
-                            <button onclick="downloadPDF('${deptName}', ${index})" class="text-[11px] bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-2 py-1 rounded-md font-medium cursor-pointer">تحميل PDF 📄</button>
-                            <button onclick="editPerson('${deptName}', ${index})" class="text-[11px] bg-amber-50 text-amber-700 hover:bg-amber-100 px-2 py-1 rounded-md font-medium cursor-pointer">تعديل ✏️</button>
-                            <button onclick="removePerson('${deptName}', ${index})" class="text-[11px] bg-rose-50 text-rose-700 hover:bg-rose-100 px-2 py-1 rounded-md font-medium cursor-pointer">حذف</button>
-                        </div>
-                    </div>
-                `).join('');
-
-                card.innerHTML = `
-                    <div>
-                        <div class="flex justify-between items-start mb-4 pb-3 border-b border-slate-100">
-                            <div>
-                                <h4 class="font-bold text-base text-slate-900">${deptName}</h4>
-                                <span class="text-[11px] bg-indigo-50 text-indigo-700 font-bold px-2 py-0.5 rounded-md mt-1 inline-block">الأعضاء: ${people.length}</span>
-                            </div>
-                            <button onclick="deleteDepartment('${deptName}')" class="text-xs text-rose-500 hover:text-rose-700 font-semibold cursor-pointer">مسح القسم 🗑️</button>
-                        </div>
-                        <div class="space-y-2 max-h-80 overflow-y-auto pr-1">
-                            ${peopleListHTML || '<p class="text-slate-400 text-xs italic text-center py-4">لا يوجد أشخاص في هذا القسم.</p>'}
-                        </div>
-                    </div>`;
-                container.appendChild(card);
-            }
-            totalCountSpan.textContent = totalPersons;
-            searchPeople();
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            event.currentTarget.classList.add('active');
         }
 
-        // حفظ الشخص (إضافة جديدة أو حفظ التعديل)
-        function savePerson() {
-            const name = document.getElementById('person-name-input').value.trim();
-            const phone = document.getElementById('person-phone-input').value.trim();
-            const info = document.getElementById('person-info-input').value.trim();
-            const img = document.getElementById('person-img-base64').value;
-            const isEdit = document.getElementById('edit-mode').value === "true";
-
-            if (!name || !phone) {
-                alert('الرجاء كتابة الاسم ورقم الهاتف على الأقل.');
-                return;
-            }
-
-            if (isEdit) {
-                // وضع التعديل
-                const oldDept = document.getElementById('edit-dept').value;
-                const index = document.getElementById('edit-index').value;
-                
-                // الاحتفاظ بالصورة القديمة إذا لم يتم رفع صورة جديدة
-                const finalImg = img ? img : data[oldDept][index].img;
-
-                data[oldDept][index] = { name, phone, info, img: finalImg };
-                resetForm();
-                updateUI();
-            } else {
-                // وضع الإضافة الجديدة
-                const dept = document.getElementById('dept-select').value;
-                if (!dept) { alert('الرجاء اختيار القسم التابع له الشخص.'); return; }
-                
-                data[dept].push({ name, phone, info, img });
-                resetForm();
-                updateUI();
-            }
+        function initSystem() {
+            renderTable();
+            renderControlPanel();
+            updateStatsAndChart();
         }
 
-        // تفعيل وضع التعديل وملء الاستمارة بالبيانات القديمة لشخص معين
-        function editPerson(deptName, index) {
-            const person = data[deptName][index];
-            
-            document.getElementById('form-title').innerText = `✏️ تعديل بيانات: ${person.name}`;
-            document.getElementById('person-name-input').value = person.name;
-            document.getElementById('person-phone-input').value = person.phone;
-            document.getElementById('person-info-input').value = person.info;
-            document.getElementById('person-img-base64').value = ""; // يتم تصفيرها استعداداً لأي صورة جديدة
-            
-            document.getElementById('edit-mode').value = "true";
-            document.getElementById('edit-dept').value = deptName;
-            document.getElementById('edit-index').value = index;
+        // بناء الجدول والتحكم بمجموعات الألوان المتطابقة مع الصورة
+        function renderTable() {
+            const tbody = document.getElementById('table-body');
+            const searchStr = document.getElementById('table-search').value.toLowerCase();
+            tbody.innerHTML = '';
 
-            document.getElementById('dept-select-container').classList.add('hidden'); // إخفاء اختيار القسم أثناء التعديل لضمان ثبات الهيكلية
-            document.getElementById('cancel-edit-btn').classList.remove('hidden');
-            document.getElementById('submit-btn').innerText = "حفظ التغييرات المحدثة";
-            document.getElementById('submit-btn').className = "bg-amber-600 hover:bg-amber-700 text-white font-medium px-8 py-2.5 rounded-xl shadow-md cursor-pointer whitespace-nowrap";
-            
-            window.scrollTo({ top: 300, behavior: 'smooth' });
-        }
-
-        function resetForm() {
-            document.getElementById('form-title').innerText = "👤 استمارة تسجيل شخص جديد";
-            document.getElementById('person-name-input').value = '';
-            document.getElementById('person-phone-input').value = '';
-            document.getElementById('person-info-input').value = '';
-            document.getElementById('person-img-file').value = '';
-            document.getElementById('person-img-base64').value = '';
-            
-            document.getElementById('edit-mode').value = "false";
-            document.getElementById('edit-dept').value = "";
-            document.getElementById('edit-index').value = "";
-
-            document.getElementById('dept-select-container').classList.remove('hidden');
-            document.getElementById('cancel-edit-btn').classList.add('hidden');
-            document.getElementById('submit-btn').innerText = "تأكيد الإدخال";
-            document.getElementById('submit-btn').className = "bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-8 py-2.5 rounded-xl shadow-md cursor-pointer whitespace-nowrap";
-        }
-
-        // توليد وتحميل الـ PDF بصورة فورية
-        function downloadPDF(deptName, index) {
-            const person = data[deptName][index];
-            
-            // تعبئة قالب الـ PDF المخفي بالمعلومات الصحيحة
-            document.getElementById('pdf-name').innerText = person.name;
-            document.getElementById('pdf-phone').innerText = person.phone;
-            document.getElementById('pdf-info').innerText = person.info ? person.info : "لا توجد معلومات إضافية";
-            document.getElementById('pdf-dept').innerText = `قسم: ${deptName}`;
-            document.getElementById('pdf-img').src = person.img ? person.img : defaultAvatar;
-
-            const element = document.getElementById('pdf-template');
-            element.classList.remove('hidden'); // إظهاره مؤقتاً للمكتبة
-
-            // إعدادات تصدير ملف الـ PDF
-            const opt = {
-                margin:       10,
-                filename:     `معلومات_${person.name}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            const badgeColors = {
+                "المطورين": "bg-indigo-50 text-indigo-600",
+                "التصميم": "bg-emerald-50 text-emerald-600",
+                "الإدارة": "bg-purple-50 text-purple-600",
+                "التسويق": "bg-amber-50 text-amber-600"
             };
 
-            // تشغيل محرك توليد وتحميل الملف
-            html2pdf().set(opt).from(element).save().then(() => {
-                element.classList.add('hidden'); // إعادة إخفائه بعد اكتمال التحميل بنجاح
+            people.filter(p => p.name.toLowerCase().includes(searchStr) || p.contact.toLowerCase().includes(searchStr)).forEach(p => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/50 transition";
+                tr.innerHTML = `
+                    <td class="py-3"><img src="${p.img || defaultAvatar}" class="w-9 h-9 rounded-full object-cover"></td>
+                    <td class="py-3 font-semibold text-slate-800">${p.name}</td>
+                    <td class="py-3 text-slate-500 font-medium">${p.contact}</td>
+                    <td class="py-3"><span class="px-2.5 py-1 rounded-lg text-[10px] font-bold ${badgeColors[p.group] || 'bg-slate-100 text-slate-600'}">${p.group}</span></td>
+                    <td class="py-3 text-slate-400">${p.date}</td>
+                    <td class="py-3 text-center">
+                        <div class="flex items-center justify-center gap-1.5">
+                            <button onclick="downloadPDF(${p.id})" class="p-1 text-slate-400 hover:text-indigo-600 text-xs cursor-pointer" title="تصدير ملف PDF">📄</button>
+                            <button onclick="loadEditPerson(${p.id})" class="p-1 text-slate-400 hover:text-amber-600 text-xs cursor-pointer" title="تعديل">✏️</button>
+                            <button onclick="deletePerson(${p.id})" class="p-1 text-slate-400 hover:text-rose-600 text-xs cursor-pointer" title="حذف">🗑️</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
             });
         }
 
-        function addDepartment() {
-            const input = document.getElementById('dept-name-input');
-            const name = input.value.trim();
-            if (name && !data[name]) {
-                data[name] = [];
-                input.value = '';
-                updateUI();
-            } else if(data[name]) { alert('القسم موجود بالفعل!'); }
+        function renderControlPanel() {
+            const select = document.getElementById('p-dept');
+            const listDiv = document.getElementById('depts-list');
+            
+            select.innerHTML = '<option value="">-- اختر المجموعة مخصصة --</option>';
+            listDiv.innerHTML = '';
+
+            groups.forEach(g => {
+                select.innerHTML += `<option value="${g}">${g}</option>`;
+                listDiv.innerHTML += `<span onclick="deleteGroup('${g}')" class="bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-600 px-3 py-1 rounded-xl text-xs font-medium cursor-pointer transition">${g} ✕</span>`;
+            });
         }
 
-        function deleteDepartment(deptName) {
-            if (confirm(`هل أنت متأكد من مسح قسم "${deptName}" بالكامل؟`)) {
-                delete data[deptName];
-                if (document.getElementById('edit-mode').value === "true" && document.getElementById('edit-dept').value === deptName) {
-                    resetForm();
-                }
-                updateUI();
+        // حساب وإرسال البيانات للرسم البياني الدائري (Chart.js)
+        function updateStatsAndChart() {
+            document.getElementById('stat-total').innerText = people.length;
+            document.getElementById('stat-depts').innerText = groups.length;
+
+            const counts = {};
+            groups.forEach(g => counts[g] = 0);
+            people.forEach(p => { if(counts[p.group] !== undefined) counts[p.group]++; });
+
+            const total = people.length || 1;
+            const percentages = groups.map(g => Math.round((counts[g] / total) * 100));
+            
+            const colorPalette = ['#4f46e5', '#10b981', '#a855f7', '#f59e0b', '#ec4899', '#64748b'];
+            const legendDiv = document.getElementById('chart-legend');
+            legendDiv.innerHTML = '';
+
+            groups.forEach((g, idx) => {
+                legendDiv.innerHTML += `
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${colorPalette[idx % colorPalette.length]}"></span>
+                            <span class="text-slate-500 font-medium">${g}</span>
+                        </div>
+                        <span class="font-bold text-slate-800">${percentages[idx]}%</span>
+                    </div>`;
+            });
+
+            if (donutChart) donutChart.destroy();
+            const ctx = document.getElementById('chart-donut').getContext('2d');
+            donutChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: groups,
+                    datasets: [{
+                        data: groups.map(g => counts[g]),
+                        backgroundColor: colorPalette,
+                        borderWidth: 0
+                    }]
+                },
+                options: { plugins: { legend: { display: false } }, cutout: '75%', responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        function savePerson() {
+            const name = document.getElementById('p-name').value.trim();
+            const contact = document.getElementById('p-contact').value.trim();
+            const group = document.getElementById('p-dept').value;
+            const base64Img = document.getElementById('p-base64').value;
+            const editId = document.getElementById('edit-id').value;
+
+            if(!name || !contact || !group) { alert("يرجى ملء البيانات المطلوبة!"); return; }
+
+            if(editId) {
+                let p = people.find(item => item.id == editId);
+                p.name = name; p.contact = contact; p.group = group;
+                if(base64Img) p.img = base64Img;
+            } else {
+                const today = new Date().toISOString().split('T')[0];
+                people.push({ id: Date.now(), name, contact, group, date: today, img: base64Img });
+            }
+
+            clearForm();
+            initSystem();
+            switchTab('dashboard');
+        }
+
+        function loadEditPerson(id) {
+            const p = people.find(item => item.id === id);
+            document.getElementById('edit-id').value = p.id;
+            document.getElementById('p-name').value = p.name;
+            document.getElementById('p-contact').value = p.contact;
+            document.getElementById('p-dept').value = p.group;
+            
+            document.getElementById('form-title').innerText = "✏️ تعديل بيانات الشخص";
+            document.getElementById('cancel-btn').classList.remove('hidden');
+            switchTab('add-person');
+        }
+
+        function clearForm() {
+            document.getElementById('edit-id').value = '';
+            document.getElementById('p-name').value = '';
+            document.getElementById('p-contact').value = '';
+            document.getElementById('p-dept').value = '';
+            document.getElementById('p-file').value = '';
+            document.getElementById('p-base64').value = '';
+            document.getElementById('form-title').innerText = "👤 تسجيل شخص جديد بالنظام";
+            document.getElementById('cancel-btn').classList.add('hidden');
+        }
+
+        function deletePerson(id) {
+            if(confirm("هل أنت متأكد من حذف هذا الشخص نهائياً؟")) {
+                people = people.filter(p => p.id !== id);
+                initSystem();
             }
         }
 
-        function removePerson(deptName, index) {
-            if (confirm("هل تريد بالتأكيد إزالة هذا الشخص؟")) {
-                data[deptName].splice(index, 1);
-                if (document.getElementById('edit-mode').value === "true" && document.getElementById('edit-index').value == index && document.getElementById('edit-dept').value === deptName) {
-                    resetForm();
-                }
-                updateUI();
+        function addDept() {
+            const val = document.getElementById('dept-input').value.trim();
+            if(val && !groups.includes(val)) {
+                groups.push(val);
+                document.getElementById('dept-input').value = '';
+                initSystem();
             }
         }
 
-        function searchPeople() {
-            const query = document.getElementById('search-input').value.trim().toLowerCase();
-            const resultsDiv = document.getElementById('search-results');
-            if (!query) { resultsDiv.classList.add('hidden'); return; }
-            let resultsHTML = '';
-            for (const [deptName, people] of Object.entries(data)) {
-                people.forEach((p, index) => {
-                    if (p.name.toLowerCase().includes(query) || p.phone.includes(query)) {
-                        resultsHTML += `
-                            <div class="flex items-center justify-between p-3 bg-white rounded-xl border border-indigo-100 shadow-sm">
-                                <div class="flex items-center gap-3">
-                                    <img src="${p.img || defaultAvatar}" class="w-10 h-10 rounded-lg object-cover">
-                                    <div>
-                                        <h5 class="font-bold text-xs text-slate-900">${p.name} <span class="text-[10px] text-slate-400">(${deptName})</span></h5>
-                                        <p class="text-[11px] text-slate-500">${p.phone}</p>
-                                    </div>
-                                </div>
-                                <button onclick="downloadPDF('${deptName}', ${index})" class="text-xs text-indigo-600 hover:underline cursor-pointer">PDF 📄</button>
-                            </div>`;
-                    }
-                });
+        function deleteGroup(name) {
+            if(confirm(`حذف مجموعة "${name}" سيؤدي لفك ارتباط أعضائها، هل أنت متأكد؟`)) {
+                groups = groups.filter(g => g !== name);
+                initSystem();
             }
-            if (resultsHTML) { resultsDiv.innerHTML = resultsHTML; resultsDiv.classList.remove('hidden'); }
-            else { resultsDiv.innerHTML = '<p class="text-slate-400 text-xs text-center col-span-full">❌ لا توجد نتائج للبحث.</p>'; resultsDiv.classList.remove('hidden'); }
+        }
+
+        // معالجة تحميل كرت الشخص بصيغة ملف PDF
+        function downloadPDF(id) {
+            const p = people.find(item => item.id === id);
+            document.getElementById('pdf-name').innerText = p.name;
+            document.getElementById('pdf-contact').innerText = p.contact;
+            document.getElementById('pdf-group').innerText = p.group;
+            document.getElementById('pdf-avatar').src = p.img || defaultAvatar;
+
+            const element = document.getElementById('pdf-container');
+            element.classList.remove('hidden');
+
+            const opt = {
+                margin: 10, filename: `كرت_${p.name}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a5', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => { element.classList.add('hidden'); });
+        }
+
+        // خاصية تبديل المظهر الليلي (Dark Mode) المضافة حديثاً
+        function toggleDarkMode() {
+            document.getElementById('body-layout').classList.toggle('dark-mode');
+            document.getElementById('sidebar-panel').classList.toggle('dark-card');
+            document.querySelectorAll('.card-el').forEach(el => el.classList.toggle('dark-card'));
+            document.querySelectorAll('.id-title').forEach(el => el.classList.toggle('text-white'));
         }
     </script>
 </body>
