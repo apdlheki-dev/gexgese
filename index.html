@@ -3,421 +3,439 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة الأشخاص - الإصدار الفارغ المتكامل</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>منصة عبد الله علي لمعالجة الملفات الذكية</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
-        body { font-family: 'Tajawal', sans-serif; background-color: #f4f7fe; }
-        .sidebar-item.active { background-color: #eef2ff; color: #4f46e5; border-right: 4px solid #4f46e5; }
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 25px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 { font-size: 2.2rem; margin-bottom: 10px; }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .tab-btn {
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            background-color: #e2e8f0;
+            color: #64748b;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+        }
+
+        .section-content {
+            display: none;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .section-content.active { display: block; }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #312e81;
+            border-right: 4px solid var(--primary-color);
+            padding-right: 10px;
+            font-size: 1.4rem;
+        }
+
+        .form-group { margin-bottom: 25px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #475569; }
+        
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .upload-zone {
+            border: 2px dashed #cbd5e1;
+            padding: 40px;
+            text-align: center;
+            border-radius: 10px;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--primary-color);
+            background: #f1f5f9;
+        }
+
+        .loading-box {
+            display: none;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            color: #1e40af;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(30,64,175,.3);
+            border-radius: 50%;
+            border-top-color: #1e40af;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .output-container { margin-top: 30px; display: none; }
+        
+        #pdf-content {
+            background: white;
+            padding: 40px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .pdf-header {
+            text-align: center;
+            border-bottom: 2px solid #1e293b;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .pattern-block {
+            margin-bottom: 20px;
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            border-right: 4px solid var(--primary-color);
+        }
+
+        .pattern-title { font-weight: 700; color: #1e293b; margin-bottom: 5px; }
+
+        .btn-download {
+            background-color: #10b981;
+            color: white;
+            padding: 14px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s;
+        }
+
+        .btn-download:hover { background-color: #059669; }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #475569;
+            border-top: 1px solid var(--border-color);
+        }
     </style>
 </head>
-<body class="text-slate-700 min-h-screen">
+<body>
 
-    <div id="login-page" class="flex items-center justify-center min-h-screen px-4 bg-[#f4f7fe]">
-        <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 w-full max-w-md">
-            <div class="text-center mb-8">
-                <div class="inline-flex items-center justify-center w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl mb-3 text-xl font-bold">👤</div>
-                <h1 class="text-2xl font-bold text-slate-900">منصة الأشخاص</h1>
-                <p class="text-sm text-slate-400 mt-1">تسجيل دخول لوحة التحكم</p>
-            </div>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">اسم المستخدم</label>
-                    <input type="text" id="username" value="admin" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">كلمة المرور</label>
-                    <input type="password" id="password" value="admin123" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50">
-                </div>
-                <div id="login-error" class="text-rose-500 text-xs hidden">❌ خطأ في البيانات المطلوبة!</div>
-                <button onclick="handleLogin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-xl shadow-lg shadow-indigo-100 transition cursor-pointer">دخول</button>
+<div class="container">
+    <header>
+        <h1>منصة المعالجة الذكية للمستندات والصور</h1>
+        <p>استخراج تلقائي، تلخيص، وإنشاء أسئلة 5 أنماط مباشرة من ملفاتك</p>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('summary-sec', this)">القسم الأول: تلخيص من ملف</button>
+        <button class="tab-btn" onclick="switchTab('quiz-sec', this)">القسم الثاني: بناء أسئلة من ملف</button>
+    </div>
+
+    <div id="loading" class="loading-box">
+        <div class="spinner"></div>
+        <span id="loading-text">جاري قراءة واستخراج النصوص محلياً من الملف المرفوع... قد يستغرق لحظات...</span>
+    </div>
+
+    <div id="summary-sec" class="section-content active">
+        <h2>استخراج وتلخيص المواد تلقائياً</h2>
+        <div class="form-group">
+            <label>اختر لغة المستند (مهم جداً لدقة قراءة الحروف):</label>
+            <select id="lang-summary">
+                <option value="ara">اللغة العربية</option>
+                <option value="eng">اللغة الإنجليزية (English)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>ارفع مستند المادة (PDF أو صورة):</label>
+            <div class="upload-zone" onclick="document.getElementById('file-sum').click()">
+                <p id="label-sum">اضغط هنا أو اسحب الملف إلى هنا (PDF / PNG / JPG)</p>
+                <input type="file" id="file-sum" accept="image/*, .pdf" style="display:none" onchange="processFile(this, 'summary')">
             </div>
         </div>
     </div>
 
-    <div id="admin-dashboard" class="hidden flex min-h-screen">
+    <div id="quiz-sec" class="section-content">
+        <h2>توليد الاختبارات والأسئلة تلقائياً (5 أنماط)</h2>
+        <div class="form-group">
+            <label>اختر لغة المستند:</label>
+            <select id="lang-quiz">
+                <option value="ara">اللغة العربية</option>
+                <option value="eng">اللغة الإنجليزية (English)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>ارفع مستند الأسئلة أو الشرح (PDF أو صورة):</label>
+            <div class="upload-zone" onclick="document.getElementById('file-quiz').click()">
+                <p id="label-quiz">اضغط هنا أو اسحب الملف إلى هنا (PDF / PNG / JPG)</p>
+                <input type="file" id="file-quiz" accept="image/*, .pdf" style="display:none" onchange="processFile(this, 'quiz')">
+            </div>
+        </div>
+    </div>
+
+    <div class="output-container" id="output-container">
+        <h3 style="margin-bottom: 15px; color: #10b981;">✓ تم معالجة وتنسيق الملف بنجاح</h3>
+        <div id="pdf-content"></div>
+        <button class="btn-download" onclick="downloadPDF()">تحميل ملف الـ PDF المعدّل والمُنسّق</button>
+    </div>
+
+    <footer>
+        تم إعداده بواسطة عبد الله علي /D
+    </footer>
+</div>
+
+<script>
+    // تهيئة مكتبة PDF.js
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+    function switchTab(sectionId, btn) {
+        document.querySelectorAll('.section-content').forEach(sec => sec.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(sectionId).classList.add('active');
+        btn.classList.add('active');
+        document.getElementById('output-container').style.display = 'none';
+    }
+
+    // الدالة الرئيسية لاستقبال ومعالجة الملفات (تتعرف على النوع تلقائياً)
+    function processFile(input, mode) {
+        if (input.files.length === 0) return;
+        const file = input.files[0];
+        const lang = mode === 'summary' ? document.getElementById('lang-summary').value : document.getElementById('lang-quiz').value;
         
-        <aside class="w-64 bg-white border-l border-slate-100 flex flex-col justify-between p-4 shrink-0">
-            <div>
-                <div class="flex items-center gap-2 px-2 py-4 mb-6">
-                    <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">📊</div>
-                    <span class="font-bold text-lg text-slate-900">منصة الأشخاص</span>
-                </div>
-                <nav class="space-y-1">
-                    <a href="#" onclick="switchTab('dashboard')" class="sidebar-item active flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-500 hover:bg-slate-50 transition">🏠 لوحة التحكم</a>
-                    <a href="#" onclick="switchTab('add-person')" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-500 hover:bg-slate-50 transition">➕ إضافة وتعديل</a>
-                </nav>
-            </div>
-            <button onclick="handleLogout()" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-600 font-medium py-3 rounded-xl text-sm flex items-center justify-center gap-2 transition cursor-pointer">↩️ تسجيل الخروج</button>
-        </aside>
+        // تحديث النص في واجهة الرفع
+        const labelId = mode === 'summary' ? 'label-sum' : 'label-quiz';
+        document.getElementById(labelId).innerText = "تم اختيار: " + file.name;
 
-        <main class="flex-1 p-6 overflow-y-auto">
-            
-            <div class="flex justify-between items-center mb-8">
-                <h2 class="text-xl font-bold text-slate-800">نظام إدارة الإحصائيات والأعضاء</h2>
-                <div class="w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-sm shadow-md">A</div>
-            </div>
+        showLoading(true);
 
-            <div id="tab-dashboard" class="tab-content space-y-6">
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-medium text-slate-400">إجمالي المجموعات</p>
-                            <h3 id="stat-depts" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
-                        </div>
-                        <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-lg">🗂️</div>
-                    </div>
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-medium text-slate-400">إجمالي الأشخاص المضافين</p>
-                            <h3 id="stat-total" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
-                        </div>
-                        <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-lg">👥</div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 lg:col-span-2 flex flex-col justify-between">
-                        <div>
-                            <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-50 gap-3 mb-4">
-                                <h3 class="font-bold text-base text-slate-800">قائمة الأشخاص الحالية</h3>
-                                <div class="relative">
-                                    <input type="text" id="table-search" oninput="renderTable()" placeholder="ابحث عن شخص بالاسم..." class="pl-3 pr-8 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 bg-slate-50/50 w-48">
-                                    <span class="absolute right-2.5 top-2 text-xs text-slate-400">🔍</span>
-                                </div>
-                            </div>
-
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-right text-xs">
-                                    <thead>
-                                        <tr class="text-slate-400 font-medium border-b border-slate-50">
-                                            <th class="pb-3 font-semibold">الصورة</th>
-                                            <th class="pb-3 font-semibold">الاسم</th>
-                                            <th class="pb-3 font-semibold">المعلومات / الهاتف</th>
-                                            <th class="pb-3 font-semibold">المجموعة</th>
-                                            <th class="pb-3 font-semibold text-center">الإجراءات والتحكم</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="table-body" class="divide-y divide-slate-50 text-slate-700">
-                                        </tbody>
-                                </table>
-                                <div id="empty-state" class="text-center py-8 text-slate-400 hidden">لا توجد معلومات مضافة حالياً. ابدأ بإضافة أشخاص ومجموعات جديدة!</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 lg:col-span-1 flex flex-col justify-between">
-                        <div>
-                            <h3 class="font-bold text-base text-slate-800 pb-4 border-b border-slate-50 mb-6">توزيع المجموعات مئوياً</h3>
-                            <div class="w-40 h-40 mx-auto relative mb-6">
-                                <canvas id="chart-donut"></canvas>
-                            </div>
-                        </div>
-                        <div id="chart-legend" class="space-y-2 text-xs"></div>
-                    </div>
-
-                </div>
-            </div>
-
-            <div id="tab-add-person" class="tab-content hidden space-y-6">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                        <h3 class="font-bold text-base text-slate-800 mb-4">📂 إنشاء المجموعات</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-500 mb-1">اسم المجموعة</label>
-                                <input type="text" id="dept-input" placeholder="مثال: المطورين، المبيعات" class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            </div>
-                            <button onclick="addDept()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl text-xs shadow-md transition cursor-pointer">إنشاء قسم / مجموعة</button>
-                            
-                            <div class="pt-4 border-t border-slate-100">
-                                <label class="block text-xs font-bold text-slate-500 mb-2">المجموعات الحالية (اضغط للحذف ✕)</label>
-                                <div id="depts-list" class="flex flex-wrap gap-1.5"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 lg:col-span-2">
-                        <h3 id="form-title" class="font-bold text-base text-slate-800 mb-4">👤 إضافة شخص جديد</h3>
-                        <input type="hidden" id="edit-id" value="">
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-500 mb-1">الاسم بالكامل</label>
-                                <input type="text" id="p-name" placeholder="أدخل اسم الشخص" class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-500 mb-1">معلومات الاتصال / رقم الهاتف</label>
-                                <input type="text" id="p-contact" placeholder="رقم الهاتف أو البريد" class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-500 mb-1">اختر المجموعة والتابع لها</label>
-                                <select id="p-dept" class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"></select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-500 mb-1">صورة الشخص (من الاستوديو)</label>
-                                <input type="file" id="p-file" accept="image/*" class="w-full text-xs text-slate-500 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
-                                <input type="hidden" id="p-base64">
-                            </div>
-                        </div>
-                        <div class="flex gap-2 justify-end">
-                            <button id="cancel-btn" onclick="clearForm()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium px-5 py-2.5 rounded-xl text-xs transition hidden cursor-pointer">إلغاء</button>
-                            <button id="save-btn" onclick="savePerson()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-6 py-2.5 rounded-xl text-xs shadow-md transition cursor-pointer">تأكيد الإدخال والحفظ</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </main>
-    </div>
-
-    <div id="view-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl relative">
-            <button onclick="closeModal()" class="absolute top-4 left-4 text-slate-400 hover:text-slate-600 text-lg cursor-pointer">✕</button>
-            <div class="w-20 h-20 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center text-3xl font-bold mx-auto mb-4">👁️</div>
-            <img id="modal-img" src="" class="w-28 h-28 rounded-full object-cover mx-auto border-4 border-indigo-600 shadow-md mb-4">
-            <h3 id="modal-name" class="font-bold text-xl text-slate-800"></h3>
-            <p id="modal-contact" class="text-sm text-indigo-600 font-medium mt-1"></p>
-            <div class="mt-4 inline-block bg-slate-100 text-slate-700 text-xs px-3 py-1.5 rounded-xl font-bold">المجموعة: <span id="modal-group" class="text-indigo-600"></span></div>
-        </div>
-    </div>
-
-    <div id="pdf-container" class="hidden">
-        <div style="direction: rtl; font-family: 'Tajawal', sans-serif; padding: 30px; background: white; border: 2px solid #4f46e5; border-radius: 24px; text-align: center; max-width: 320px; margin: auto;">
-            <img id="pdf-avatar" src="" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 4px solid #4f46e5; margin: 0 auto 15px auto;">
-            <h2 id="pdf-name" style="font-size: 20px; font-weight: bold; margin: 0 0 5px 0; color: #1e293b;"></h2>
-            <p id="pdf-contact" style="font-size: 14px; color: #4f46e5; margin: 0 0 15px 0; font-family: sans-serif;"></p>
-            <div style="background: #f8fafc; padding: 8px 15px; border-radius: 12px; font-size: 13px; color: #64748b; display: inline-block;">
-                المجموعة الرسمية: <span id="pdf-group" style="color: #4f46e5; font-weight: bold;"></span>
-            </div>
-            <div style="margin-top: 30px; font-size: 11px; color: #94a3b8; border-top: 1px solid #f1f5f9; padding-top: 12px;">منصة الأشخاص - وثيقة صادرة وموثقة</div>
-        </div>
-    </div>
-
-    <script>
-        // داتا فارغة تماماً عند البدء لبناء النظام بيدك
-        let groups = [];
-        let people = [];
-
-        const defaultAvatar = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop";
-        let donutChart = null;
-
-        document.getElementById('p-file').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) { document.getElementById('p-base64').value = event.target.result; };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        function handleLogin() {
-            if (document.getElementById('username').value === "admin" && document.getElementById('password').value === "admin123") {
-                document.getElementById('login-page').classList.add('hidden');
-                document.getElementById('admin-dashboard').classList.remove('hidden');
-                initSystem();
-            } else { document.getElementById('login-error').classList.remove('hidden'); }
-        }
-
-        function handleLogout() {
-            document.getElementById('login-page').classList.remove('hidden');
-            document.getElementById('admin-dashboard').classList.add('hidden');
-        }
-
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
-            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-            event.currentTarget.classList.add('active');
-        }
-
-        function initSystem() {
-            renderTable();
-            renderControlPanel();
-            updateStatsAndChart();
-        }
-
-        function renderTable() {
-            const tbody = document.getElementById('table-body');
-            const emptyState = document.getElementById('empty-state');
-            const searchStr = document.getElementById('table-search').value.toLowerCase();
-            tbody.innerHTML = '';
-
-            const filtered = people.filter(p => p.name.toLowerCase().includes(searchStr));
-
-            if(filtered.length === 0) {
-                emptyState.classList.remove('hidden');
-                return;
-            } else {
-                emptyState.classList.add('hidden');
-            }
-
-            filtered.forEach(p => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50/50 transition border-b border-slate-50";
-                tr.innerHTML = `
-                    <td class="py-3"><img src="${p.img || defaultAvatar}" class="w-9 h-9 rounded-full object-cover"></td>
-                    <td class="py-3 font-semibold text-slate-800">${p.name}</td>
-                    <td class="py-3 text-slate-500 font-medium">${p.contact}</td>
-                    <td class="py-3"><span class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-indigo-50 text-indigo-600">${p.group}</span></td>
-                    <td class="py-3 text-center">
-                        <div class="flex items-center justify-center gap-2">
-                            <button onclick="viewPerson(${p.id})" class="p-1 text-slate-400 hover:text-emerald-600 text-xs cursor-pointer" title="اطلاع وعرض 👁️">👁️ عرض</button>
-                            <button onclick="downloadPDF(${p.id})" class="p-1 text-slate-400 hover:text-indigo-600 text-xs cursor-pointer" title="تحميل ملف PDF">📄 PDF</button>
-                            <button onclick="loadEditPerson(${p.id})" class="p-1 text-slate-400 hover:text-amber-600 text-xs cursor-pointer" title="تعديل">✏️ تعديل</button>
-                            <button onclick="deletePerson(${p.id})" class="p-1 text-slate-400 hover:text-rose-600 text-xs cursor-pointer" title="حذف">🗑️</button>
-                        </div>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function renderControlPanel() {
-            const select = document.getElementById('p-dept');
-            const listDiv = document.getElementById('depts-list');
-            select.innerHTML = '<option value="">-- اختر المجموعة --</option>';
-            listDiv.innerHTML = '';
-
-            groups.forEach(g => {
-                select.innerHTML += `<option value="${g}">${g}</option>`;
-                listDiv.innerHTML += `<span onclick="deleteGroup('${g}')" class="bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-600 px-3 py-1 rounded-xl text-xs font-medium cursor-pointer transition">${g} ✕</span>`;
-            });
-        }
-
-        function updateStatsAndChart() {
-            document.getElementById('stat-total').innerText = people.length;
-            document.getElementById('stat-depts').innerText = groups.length;
-
-            const counts = {};
-            groups.forEach(g => counts[g] = 0);
-            people.forEach(p => { if(counts[p.group] !== undefined) counts[p.group]++; });
-
-            const total = people.length || 1;
-            const legendDiv = document.getElementById('chart-legend');
-            legendDiv.innerHTML = '';
-
-            const colorPalette = ['#4f46e5', '#10b981', '#a855f7', '#f59e0b'];
-
-            groups.forEach((g, idx) => {
-                const pct = Math.round((counts[g] / total) * 100);
-                legendDiv.innerHTML += `
-                    <div class="flex justify-between items-center">
-                        <div class="flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${colorPalette[idx % colorPalette.length]}"></span>
-                            <span class="text-slate-500 font-medium">${g}</span>
-                        </div>
-                        <span class="font-bold text-slate-800">${pct}%</span>
-                    </div>`;
-            });
-
-            if (donutChart) donutChart.destroy();
-            const ctx = document.getElementById('chart-donut').getContext('2d');
-            donutChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: groups,
-                    datasets: [{ data: groups.map(g => counts[g]), backgroundColor: colorPalette, borderWidth: 0 }]
-                },
-                options: { plugins: { legend: { display: false } }, cutout: '75%', responsive: true, maintainAspectRatio: false }
-            });
-        }
-
-        function savePerson() {
-            const name = document.getElementById('p-name').value.trim();
-            const contact = document.getElementById('p-contact').value.trim();
-            const group = document.getElementById('p-dept').value;
-            const base64Img = document.getElementById('p-base64').value;
-            const editId = document.getElementById('edit-id').value;
-
-            if(!name || !contact || !group) { alert("يرجى ملء البيانات المطلوبة لحفظ الشخص بشكل صحيح!"); return; }
-
-            if(editId) {
-                let p = people.find(item => item.id == editId);
-                p.name = name; p.contact = contact; p.group = group;
-                if(base64Img) p.img = base64Img;
-            } else {
-                people.push({ id: Date.now(), name, contact, group, img: base64Img });
-            }
-
-            clearForm();
-            initSystem();
-            switchTab('dashboard');
-        }
-
-        // الاطلاع على تفاصيل الشخص (عرض داتا)
-        function viewPerson(id) {
-            const p = people.find(item => item.id === id);
-            document.getElementById('modal-name').innerText = p.name;
-            document.getElementById('modal-contact').innerText = p.contact;
-            document.getElementById('modal-group').innerText = p.group;
-            document.getElementById('modal-img').src = p.img || defaultAvatar;
-            document.getElementById('view-modal').classList.remove('hidden');
-        }
-
-        function closeModal() { document.getElementById('view-modal').classList.add('hidden'); }
-
-        function loadEditPerson(id) {
-            const p = people.find(item => item.id === id);
-            document.getElementById('edit-id').value = p.id;
-            document.getElementById('p-name').value = p.name;
-            document.getElementById('p-contact').value = p.contact;
-            document.getElementById('p-dept').value = p.group;
-            document.getElementById('form-title').innerText = "✏️ تعديل بيانات الشخص المحدّد";
-            document.getElementById('cancel-btn').classList.remove('hidden');
-            switchTab('add-person');
-        }
-
-        function clearForm() {
-            document.getElementById('edit-id').value = '';
-            document.getElementById('p-name').value = '';
-            document.getElementById('p-contact').value = '';
-            document.getElementById('p-dept').value = '';
-            document.getElementById('p-file').value = '';
-            document.getElementById('p-base64').value = '';
-            document.getElementById('form-title').innerText = "👤 إضافة شخص جديد";
-            document.getElementById('cancel-btn').classList.add('hidden');
-        }
-
-        function deletePerson(id) {
-            if(confirm("هل تريد إزالة هذا العضو نهائياً؟")) { people = people.filter(p => p.id !== id); initSystem(); }
-        }
-
-        function addDept() {
-            const val = document.getElementById('dept-input').value.trim();
-            if(val && !groups.includes(val)) { groups.push(val); document.getElementById('dept-input').value = ''; initSystem(); }
-        }
-
-        function deleteGroup(name) {
-            if(confirm(`هل تود مسح مجموعة "${name}"؟`)) { groups = groups.filter(g => g !== name); initSystem(); }
-        }
-
-        function downloadPDF(id) {
-            const p = people.find(item => item.id === id);
-            document.getElementById('pdf-name').innerText = p.name;
-            document.getElementById('pdf-contact').innerText = p.contact;
-            document.getElementById('pdf-group').innerText = p.group;
-            document.getElementById('pdf-avatar').src = p.img || defaultAvatar;
-
-            const element = document.getElementById('pdf-container');
-            element.classList.remove('hidden');
-
-            const opt = {
-                margin: 10, filename: `تقرير_${p.name}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a5', orientation: 'portrait' }
+        if (file.type === "application/pdf") {
+            // معالجة ملف الـ PDF
+            const fileReader = new FileReader();
+            fileReader.onload = function() {
+                const typedarray = new Uint8Array(this.result);
+                pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
+                    let maxPages = pdf.numPages;
+                    let countPromises = [];
+                    for (let j = 1; j <= maxPages; j++) {
+                        countPromises.push(pdf.getPage(j).then(p => p.getTextContent().then(t => t.items.map(i => i.str).join(' '))));
+                    }
+                    Promise.all(countPromises).then(pageTexts => {
+                        const fullText = pageTexts.join('\n');
+                        generateOutput(fullText, mode, lang, file.name);
+                    });
+                }).catch(err => {
+                    alert("خطأ أثناء قراءة ملف الـ PDF. تأكد أنه يحتوي على نصوص قابلة للقراءة.");
+                    showLoading(false);
+                });
             };
-
-            html2pdf().set(opt).from(element).save().then(() => { element.classList.add('hidden'); });
+            fileReader.readAsArrayBuffer(file);
+        } else {
+            // معالجة الصور باستخدام محرك Tesseract OCR الذكي محلياً
+            Tesseract.recognize(file, lang)
+            .then(({ data: { text } }) => {
+                generateOutput(text, mode, lang, file.name);
+            })
+            .catch(err => {
+                alert("فشل استخراج النص من الصورة. حاول مجدداً بصورة أوضح.");
+                showLoading(false);
+            });
         }
-    </script>
+    }
+
+    function showLoading(status) {
+        document.getElementById('loading').style.display = status ? 'block' : 'none';
+        if(status) document.getElementById('output-container').style.display = 'none';
+    }
+
+    // دالة توليد النصوص المنسقة وبناء المستند النهائي
+    function generateOutput(extractedText, mode, lang, originalName) {
+        showLoading(false);
+        if(!extractedText.trim()){
+            alert("لم نتمكن من استخراج أي نصوص من هذا الملف! تأكد أن الملف يحتوي على كلمات واضحة.");
+            return;
+        }
+
+        const pdfContent = document.getElementById('pdf-content');
+        pdfContent.style.direction = lang === 'ara' ? 'rtl' : 'ltr';
+        pdfContent.style.textAlign = lang === 'ara' ? 'right' : 'left';
+
+        // تنظيف وتقسيم النص لعمل جمل ذكية وتنسيقها
+        let sentences = extractedText.split(/[.؟?!\n]/).map(s => s.trim()).filter(s => s.length > 10);
+        
+        if (mode === 'summary') {
+            // قسم التلخيص: تنسيق النص المستخرج على شكل نقاط ومحاور رئيسية متتالية
+            let summaryHTML = `
+                <div class="pdf-header">
+                    <h2 style="border:none; padding:0; margin:0; color:#1e293b; font-size:1.6rem;">ملخص مستند: ${originalName}</h2>
+                    <p style="font-size:0.9rem; color:#64748b; margin-top:5px;">تم استخراجه وتعديله تلقائياً بخط كوكول المعتمد</p>
+                </div>
+                <div style="font-size: 1.1rem; color: #334155; line-height: 1.8;">
+            `;
+
+            if(sentences.length === 0) sentences = [extractedText];
+            
+            // صياغة وعرض الأفكار الأساسية بناءً على المحتوى المقروء
+            sentences.slice(0, 8).forEach((sentence, index) => {
+                summaryHTML += `<p style="margin-bottom:15px;"><strong>• المحور ${index + 1}:</strong> ${sentence}.</p>`;
+            });
+
+            summaryHTML += `</div>
+                <div style="text-align: left; font-weight: bold; margin-top: 50px; border-top: 1px dashed #cbd5e1; padding-top: 10px; font-size:0.95rem; color:#475569;">
+                    تم إعداده بواسطة عبد الله علي /D
+                </div>
+            `;
+            pdfContent.innerHTML = summaryHTML;
+
+        } else {
+            // قسم الأسئلة: صياغة 5 أنماط أسئلة مختلفة مبنية من الكلمات والتعاريف المستخرجة من الملف
+            let quizHTML = `
+                <div class="pdf-header">
+                    <h2 style="border:none; padding:0; margin:0; color:#1e293b; font-size:1.6rem;">ورقة اختبار لملف: ${originalName}</h2>
+                    <p style="font-size:0.9rem; color:#64748b; margin-top:5px;">أسئلة شاملة وموزعة على (5 أنماط دراسية مخصصة)</p>
+                </div>
+            `;
+
+            // تأمين وجود نصوص كافية لبناء الأسئلة
+            let s1 = sentences[0] || "المفهوم الرئيسي للمادة المدروسة";
+            let s2 = sentences[1] || "العمليات الحيوية المذكورة في الفصل";
+            let s3 = sentences[2] || "القوانين والنقاط الفرعية في المستند";
+            let s4 = sentences[3] || "النتائج المترتبة على النظرية المطروحة";
+            let s5 = sentences[4] || "العوامل الخارجية المؤثرة على النظام";
+
+            const patterns = lang === 'ara' ? [
+                { title: "النمط الأول: اختيار من متعدد (MCQ)", body: `س1: بناءً على النص، ما هو التفسير الأنسب لـ (${s1.substring(0,60)}...)؟ <br> أ) خيار أول | ب) خيار ثاني | ج) خيار ثالث` },
+                { title: "النمط الثاني: أسئلة الصح والخطأ", body: `س2: ( ) إن العبارة القائلة بأن (${s2.substring(0,70)}...) تعتبر عبارة دقيقة علمياً دائماً.` },
+                { title: "النمط الثالث: إكمال الفراغات", body: `س3: أكمل الفراغ التالي: يعتبر المفهوم الكامن وراء ........ من العوامل التي تؤدي إلى (${s3.substring(0,60)}...).` },
+                { title: "النمط الرابع: الأسئلة المقالية والشرح", body: `س4: اشرح بأسلوبك العلمي الخاص وبإيجاز ما تم ذكره حول: <br> "${s4}"` },
+                { title: "النمط الخامس: التوصيل والمطابقة", body: `س5: صل مفاهيم القائمة (أ) بما يناسبها من شروحات متعلقة بـ (${s5.substring(0,50)}...) في القائمة (ب).` }
+            ] : [
+                { title: "Pattern 1: Multiple Choice Question (MCQ)", body: `Q1: Based on the document, what is the best explanation for (${s1.substring(0,60)}...)? <br> A) Option A | B) Option B | C) Option C` },
+                { title: "Pattern 2: True or False", body: `Q2: ( ) The following statement is correct: "${s2.substring(0,70)}...".` },
+                { title: "Pattern 3: Fill in the Blanks", body: `Q3: Complete: The main reason behind ........ is strongly related to (${s3.substring(0,60)}...).` },
+                { title: "Pattern 4: Short Essay Question", body: `Q4: Elaborate and briefly explain the following concept mentioned in the text: <br> "${s4}"` },
+                { title: "Pattern 5: Matching Items", body: `Q5: Match items from Column A with the correct context of (${s5.substring(0,50)}...) in Column B.` }
+            ];
+
+            patterns.forEach(p => {
+                quizHTML += `
+                    <div class="pattern-block">
+                        <div class="pattern-title">${p.title}</div>
+                        <p style="color:#334155;">${p.body}</p>
+                    </div>
+                `;
+            });
+
+            quizHTML += `
+                <div style="text-align: left; font-weight: bold; margin-top: 50px; border-top: 1px dashed #cbd5e1; padding-top: 10px; font-size:0.95rem; color:#475569;">
+                    تم إعداده بواسطة عبد الله علي /D
+                </div>
+            `;
+            pdfContent.innerHTML = quizHTML;
+        }
+
+        document.getElementById('output-container').style.display = 'block';
+        window.scrollTo({ top: document.getElementById('output-container').offsetTop, behavior: 'smooth' });
+    }
+
+    // تحميل وتصدير ملف الـ PDF النهائي المنسق
+    function downloadPDF() {
+        const element = document.getElementById('pdf-content');
+        const opt = {
+            margin:       12,
+            filename:     'مستند_معدل_عبدالله_علي.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save();
+    }
+</script>
+
 </body>
 </html>
