@@ -3,34 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة الإحصاء الذكية - لوحة التحكم</title>
+    <title>منصة الإحصاء الاحترافية - لوحة التحكم</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-        .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
 
     <div id="login-page" class="flex items-center justify-center min-h-screen px-4">
-        <div class="bg-white p-8 rounded-2xl shadow-xl border border-slate-100 w-full max-w-md transition-all duration-300">
+        <div class="bg-white p-8 rounded-2xl shadow-xl border border-slate-100 w-full max-w-md">
             <div class="text-center mb-8">
                 <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl mb-4 text-2xl shadow-sm">🔐</div>
                 <h1 class="text-2xl font-bold text-slate-900">تسجيل دخول المسؤول</h1>
                 <p class="text-sm text-slate-500 mt-1">الرجاء إدخال بيانات الاعتماد للوصول للوحة التحكم</p>
             </div>
-            
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1">اسم المستخدم</label>
-                    <input type="text" id="username" placeholder="ادخل admin" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50">
+                    <input type="text" id="username" placeholder="admin" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1">كلمة المرور</label>
-                    <input type="password" id="password" placeholder="ادخل admin123" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50">
+                    <input type="password" id="password" placeholder="admin123" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50">
                 </div>
                 <div id="login-error" class="text-red-500 text-xs font-medium hidden">❌ اسم المستخدم أو كلمة المرور غير صحيحة!</div>
-                <button onclick="handleLogin()" class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-medium py-3 rounded-xl shadow-md shadow-indigo-200 transition duration-200 mt-2 cursor-pointer">تسجيل الدخول</button>
+                <button onclick="handleLogin()" class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-medium py-3 rounded-xl shadow-md cursor-pointer">تسجيل الدخول</button>
             </div>
         </div>
     </div>
@@ -39,118 +38,134 @@
         
         <header class="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mb-8 gap-4">
             <div class="flex items-center gap-4 text-center md:text-right">
-                <div class="w-12 h-12 bg-indigo-600 text-white flex items-center justify-center rounded-xl font-bold text-xl shadow-md shadow-indigo-100">💻</div>
+                <div class="w-12 h-12 bg-indigo-600 text-white flex items-center justify-center rounded-xl font-bold text-xl shadow-md">💻</div>
                 <div>
-                    <h2 class="text-xl font-bold text-slate-900">لوحة الإدارة والإحصاء العامة</h2>
-                    <p class="text-xs text-emerald-600 font-medium flex items-center gap-1 justify-center md:justify-start">
-                        <span class="w-2 h-2 bg-emerald-500 rounded-full inline-block animate-pulse"></span> متصل الآن كـ مسؤول النظام
-                    </p>
+                    <h2 class="text-xl font-bold text-slate-900">لوحة الإدارة والإحصاء المتطورة</h2>
+                    <p class="text-xs text-emerald-600 font-medium">● متصل الآن كـ مسؤول النظام</p>
                 </div>
             </div>
-            
             <div class="flex items-center gap-4">
                 <div class="bg-indigo-50/60 border border-indigo-100 px-6 py-3 rounded-xl text-center min-w-[140px]">
                     <span class="block text-xs text-indigo-600 font-semibold mb-0.5">إجمالي الأشخاص</span>
                     <span id="total-count" class="text-2xl font-black text-indigo-900">0</span>
                 </div>
-                <button onclick="handleLogout()" class="bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 px-4 py-2.5 rounded-xl text-sm font-medium transition cursor-pointer">تسجيل الخروج ↩️</button>
+                <button onclick="handleLogout()" class="bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 px-4 py-2.5 rounded-xl text-sm font-medium cursor-pointer">تسجيل الخروج ↩️</button>
             </div>
         </header>
 
         <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 mb-8">
-            <h3 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">🔍 نظام البحث الفوري عن الأشخاص</h3>
-            <div class="relative">
-                <input type="text" id="search-input" oninput="searchPeople()" placeholder="اكتب اسم الشخص، رقم الهاتف، أو الوظيفة للبحث الفوري عبر كافة الأقسام..." class="w-full pr-5 pl-4 py-3.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50 text-base">
-            </div>
+            <h3 class="text-sm font-bold text-slate-700 mb-3">🔍 نظام البحث الفوري عن الأشخاص</h3>
+            <input type="text" id="search-input" oninput="searchPeople()" placeholder="اكتب اسم الشخص أو رقم الهاتف للبحث الفوري..." class="w-full px-5 py-3.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50 text-base">
             <div id="search-results" class="hidden mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200"></div>
         </section>
 
         <section class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 lg:col-span-1">
-                <h3 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">📂 إدارة وهيكلة الأقسام</h3>
+                <h3 class="text-base font-bold text-slate-900 mb-4">📂 إدارة الأقسام</h3>
                 <div class="space-y-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 mb-1">اسم القسم الجديد</label>
-                        <input type="text" id="dept-name-input" placeholder="مثال: الموارد البشرية، الصيانة" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <input type="text" id="dept-name-input" placeholder="مثال: التقنية، الحسابات" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
-                    <button onclick="addDepartment()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium py-2.5 rounded-xl transition cursor-pointer">إضافة قسم جديد +</button>
+                    <button onclick="addDepartment()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium py-2.5 rounded-xl cursor-pointer">إضافة قسم جديد +</button>
                 </div>
             </div>
 
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 lg:col-span-2">
-                <h3 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">👤 استمارة تسجيل وإضافة شخص</h3>
+                <h3 id="form-title" class="text-base font-bold text-slate-900 mb-4">👤 استمارة تسجيل شخص جديد</h3>
+                <input type="hidden" id="edit-mode" value="false">
+                <input type="hidden" id="edit-dept" value="">
+                <input type="hidden" id="edit-index" value="">
+                
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-500 mb-1">اسم الشخص ثلاثي</label>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">اسم الشخص الكامل</label>
                         <input type="text" id="person-name-input" placeholder="أدخل الاسم الكامل" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 mb-1">رقم الهاتف</label>
-                        <input type="tel" id="person-phone-input" placeholder="رقم الهاتف الخلوي" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-right">
+                        <input type="tel" id="person-phone-input" placeholder="رقم الهاتف" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-right">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 mb-1">معلومات إضافية / الوظيفة</label>
-                        <input type="text" id="person-info-input" placeholder="مثال: مهندس برمجيات، محاسب" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <input type="text" id="person-info-input" placeholder="الوظيفة أو ملاحظات" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-500 mb-1">رابط صورة الشخص الشخصية (اختياري)</label>
-                        <input type="text" id="person-img-input" placeholder="ضع رابط الصورة هنا" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-left">
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">صورة الشخص (من المعرض)</label>
+                        <input type="file" id="person-img-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
+                        <input type="hidden" id="person-img-base64" value="">
                     </div>
                 </div>
                 <div class="flex flex-col sm:flex-row gap-3">
-                    <div class="flex-1">
+                    <div class="flex-1" id="dept-select-container">
                         <select id="dept-select" class="w-full px-4 py-2.5 border border-slate-200 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
                             <option value="">-- حدد القسم التابع له الشخص --</option>
                         </select>
                     </div>
-                    <button onclick="addPerson()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-8 py-2.5 rounded-xl shadow-md shadow-emerald-100 transition cursor-pointer whitespace-nowrap">تأكيد إدراج الشخص</button>
+                    <button id="submit-btn" onclick="savePerson()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-8 py-2.5 rounded-xl shadow-md cursor-pointer whitespace-nowrap">تأكيد الإدخال</button>
+                    <button id="cancel-edit-btn" onclick="resetForm()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium px-4 py-2.5 rounded-xl cursor-pointer hidden">إلغاء التعديل</button>
                 </div>
             </div>
         </section>
 
-        <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">📊 الإحصاء الميداني وتوزيع الأقسام</h3>
-        <div id="departments-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <h3 class="text-lg font-bold text-slate-900 mb-4">📊 توزيع الأقسام والأعضاء</h3>
+        <div id="departments-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </div>
+
+    <div id="pdf-template" class="hidden">
+        <div style="font-family: 'Segoe UI', Tahoma, sans-serif; direction: rtl; padding: 30px; background: #fff; border: 2px solid #4f46e5; border-radius: 20px; max-w-sm: 400px; margin: auto; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <div style="background: linear-gradient(135deg, #4f46e5, #3730a3); color: #fff; padding: 15px; margin: -30px -30px 25px -30px; border-top-left-radius: 18px; border-top-right-radius: 18px;">
+                <h2 style="margin: 0; font-size: 20px;">بطاقة تعريفية رسمية</h2>
+                <p id="pdf-dept" style="margin: 5px 0 0 0; font-size: 13px; color: #e0e7ff;"></p>
             </div>
+            <img id="pdf-img" src="" style="width: 130px; height: 130px; border-radius: 50%; object-cover: true; border: 4px solid #f0fdf4; margin-bottom: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+            <h3 id="pdf-name" style="margin: 0 0 8px 0; color: #111827; font-size: 22px; font-weight: bold;"></h3>
+            <p id="pdf-phone" style="margin: 0 0 8px 0; color: #4f46e5; font-size: 15px; font-weight: 600; direction: ltr;"></p>
+            <p id="pdf-info" style="margin: 0; color: #6b7280; font-size: 14px; background: #f9fafb; padding: 10px; border-radius: 10px; border: 1px solid #f3f4f6;"></p>
+            <div style="margin-top: 25px; border-top: 1px solid #e5e7eb; padding-top: 10px; font-size: 11px; color: #9ca3af;">منصة إحصاء الأشخاص الإدارية</div>
+        </div>
     </div>
 
     <script>
-        // حساب المسؤول الافتراضي لتسجيل الدخول
         const ADMIN_USER = "admin";
         const ADMIN_PASS = "admin123";
 
-        // قاعدة البيانات فارغة تماماً بناءً على طلبك لتبدأ بإضافة بياناتك الشخصية
-        let data = {};
-
-        // رابط صورة افتراضية غاية في الأناقة في حال عدم إدراج صورة للشخص
+        let data = {}; // قاعدة البيانات تبدأ فارغة تماماً
         const defaultAvatar = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80";
 
-        // التعامل مع تسجيل الدخول
+        // معالجة اختيار ملف الصورة وتحويله لـ Base64 لحفظه محلياً في الصفحة
+        document.getElementById('person-img-file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    document.getElementById('person-img-base64').value = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
         function handleLogin() {
             const user = document.getElementById('username').value.trim();
             const pass = document.getElementById('password').value.trim();
-            const errorMsg = document.getElementById('login-error');
-
             if (user === ADMIN_USER && pass === ADMIN_PASS) {
                 document.getElementById('login-page').classList.add('hidden');
                 document.getElementById('admin-dashboard').classList.remove('hidden');
                 updateUI();
             } else {
-                errorMsg.classList.remove('hidden');
+                document.getElementById('login-error').classList.remove('hidden');
             }
         }
 
-        // التعامل مع تسجيل الخروج
         function handleLogout() {
             document.getElementById('username').value = '';
             document.getElementById('password').value = '';
             document.getElementById('admin-dashboard').classList.add('hidden');
             document.getElementById('login-page').classList.remove('hidden');
-            document.getElementById('login-error').classList.add('hidden');
         }
 
-        // تحديث وإعادة بناء واجهة لوحة التحكم طبقاً للبيانات المحدثة والجديدة
         function updateUI() {
             const container = document.getElementById('departments-container');
             const select = document.getElementById('dept-select');
@@ -158,16 +173,14 @@
             
             container.innerHTML = '';
             select.innerHTML = '<option value="">-- حدد القسم التابع له الشخص --</option>';
-            
             let totalPersons = 0;
 
-            // إذا كانت المنصة لا تحتوي على أقسام بعد
             if (Object.keys(data).length === 0) {
                 container.innerHTML = `
                     <div class="col-span-full bg-white text-center p-12 rounded-2xl border border-dashed border-slate-300">
                         <span class="text-4xl">📂</span>
-                        <h4 class="text-lg font-bold text-slate-700 mt-3">المنصة فارغة تماماً وجاهزة للعمل</h4>
-                        <p class="text-sm text-slate-400 mt-1">ابدأ الآن بإضافة أول قسم من الصندوق المخصص على اليمين.</p>
+                        <h4 class="text-lg font-bold text-slate-700 mt-3">المنصة فارغة وجاهزة للعمل</h4>
+                        <p class="text-sm text-slate-400 mt-1">ابدأ بإضافة قسم أولاً لتتمكن من ملء بيانات الأشخاص.</p>
                     </div>`;
                 totalCountSpan.textContent = 0;
                 return;
@@ -176,28 +189,29 @@
             for (const [deptName, people] of Object.entries(data)) {
                 totalPersons += people.length;
 
-                // إضافة القسم في القائمة المنسدلة لإضافة الأشخاص
                 const option = document.createElement('option');
                 option.value = deptName;
                 option.textContent = deptName;
                 select.appendChild(option);
 
-                // إنشاء بطاقة عرض القسم
                 const card = document.createElement('div');
-                card.className = "bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col justify-between p-5";
+                card.className = "bg-white rounded-2xl shadow-sm border border-slate-100 p-5 flex flex-col justify-between";
                 
-                // بناء هيكل الأفراد المسجلين داخل القسم الحالي
                 let peopleListHTML = people.map((p, index) => `
-                    <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 hover:bg-slate-100/70 transition duration-150">
+                    <div class="flex flex-col gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100 hover:bg-slate-100/70 transition">
                         <div class="flex items-center gap-3">
-                            <img src="${p.img || defaultAvatar}" alt="${p.name}" class="w-10 h-10 rounded-xl object-cover border border-slate-200">
-                            <div>
+                            <img src="${p.img || defaultAvatar}" class="w-12 h-12 rounded-xl object-cover border border-slate-200 bg-white">
+                            <div class="flex-1">
                                 <h4 class="font-bold text-slate-800 text-sm">${p.name}</h4>
                                 <p class="text-[11px] text-indigo-600 font-medium">${p.phone}</p>
                                 ${p.info ? `<p class="text-[11px] text-slate-400 mt-0.5">${p.info}</p>` : ''}
                             </div>
                         </div>
-                        <button onclick="removePerson('${deptName}', ${index})" class="text-xs bg-white text-rose-600 hover:bg-rose-50 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-rose-100 shadow-sm transition cursor-pointer">حذف</button>
+                        <div class="flex gap-1.5 border-t border-slate-200/60 pt-2 justify-end">
+                            <button onclick="downloadPDF('${deptName}', ${index})" class="text-[11px] bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-2 py-1 rounded-md font-medium cursor-pointer">تحميل PDF 📄</button>
+                            <button onclick="editPerson('${deptName}', ${index})" class="text-[11px] bg-amber-50 text-amber-700 hover:bg-amber-100 px-2 py-1 rounded-md font-medium cursor-pointer">تعديل ✏️</button>
+                            <button onclick="removePerson('${deptName}', ${index})" class="text-[11px] bg-rose-50 text-rose-700 hover:bg-rose-100 px-2 py-1 rounded-md font-medium cursor-pointer">حذف</button>
+                        </div>
                     </div>
                 `).join('');
 
@@ -206,61 +220,124 @@
                         <div class="flex justify-between items-start mb-4 pb-3 border-b border-slate-100">
                             <div>
                                 <h4 class="font-bold text-base text-slate-900">${deptName}</h4>
-                                <span class="text-[11px] bg-indigo-50 text-indigo-700 font-bold px-2 py-0.5 rounded-md mt-1 inline-block">المقيدين: ${people.length} شخص</span>
+                                <span class="text-[11px] bg-indigo-50 text-indigo-700 font-bold px-2 py-0.5 rounded-md mt-1 inline-block">الأعضاء: ${people.length}</span>
                             </div>
-                            <button onclick="deleteDepartment('${deptName}')" class="text-xs text-rose-500 hover:text-rose-700 font-semibold p-1 transition cursor-pointer">مسح القسم 🗑️</button>
+                            <button onclick="deleteDepartment('${deptName}')" class="text-xs text-rose-500 hover:text-rose-700 font-semibold cursor-pointer">مسح القسم 🗑️</button>
                         </div>
-                        <div class="space-y-2 max-h-72 overflow-y-auto pr-1">
-                            ${peopleListHTML || '<p class="text-slate-400 text-xs italic text-center py-4">لا يوجد أشخاص مضافين في هذا القسم.</p>'}
+                        <div class="space-y-2 max-h-80 overflow-y-auto pr-1">
+                            ${peopleListHTML || '<p class="text-slate-400 text-xs italic text-center py-4">لا يوجد أشخاص في هذا القسم.</p>'}
                         </div>
-                    </div>
-                `;
+                    </div>`;
                 container.appendChild(card);
             }
             totalCountSpan.textContent = totalPersons;
-            searchPeople(); // تحديث فوري لنتائج البحث في حال التعديل
+            searchPeople();
         }
 
-        // نظام البحث اللحظي المتقدم
-        function searchPeople() {
-            const query = document.getElementById('search-input').value.trim().toLowerCase();
-            const resultsDiv = document.getElementById('search-results');
-            
-            if (!query) {
-                resultsDiv.classList.add('hidden');
+        // حفظ الشخص (إضافة جديدة أو حفظ التعديل)
+        function savePerson() {
+            const name = document.getElementById('person-name-input').value.trim();
+            const phone = document.getElementById('person-phone-input').value.trim();
+            const info = document.getElementById('person-info-input').value.trim();
+            const img = document.getElementById('person-img-base64').value;
+            const isEdit = document.getElementById('edit-mode').value === "true";
+
+            if (!name || !phone) {
+                alert('الرجاء كتابة الاسم ورقم الهاتف على الأقل.');
                 return;
             }
 
-            let resultsHTML = '';
-            
-            for (const [deptName, people] of Object.entries(data)) {
-                people.forEach((p, index) => {
-                    if (p.name.toLowerCase().includes(query) || p.phone.includes(query) || (p.info && p.info.toLowerCase().includes(query))) {
-                        resultsHTML += `
-                            <div class="flex items-center justify-between p-3 bg-white rounded-xl border border-indigo-100 shadow-sm">
-                                <div class="flex items-center gap-3">
-                                    <img src="${p.img || defaultAvatar}" class="w-10 h-10 rounded-lg object-cover">
-                                    <div>
-                                        <h5 class="font-bold text-xs text-slate-900">${p.name} <span class="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-500 font-normal mr-1">${deptName}</span></h5>
-                                        <p class="text-[11px] text-slate-500">${p.phone} ${p.info ? ` | ${p.info}` : ''}</p>
-                                    </div>
-                                </div>
-                                <button onclick="removePerson('${deptName}', ${index})" class="text-xs text-rose-600 hover:underline cursor-pointer">حذف الشخص</button>
-                            </div>`;
-                    }
-                });
-            }
+            if (isEdit) {
+                // وضع التعديل
+                const oldDept = document.getElementById('edit-dept').value;
+                const index = document.getElementById('edit-index').value;
+                
+                // الاحتفاظ بالصورة القديمة إذا لم يتم رفع صورة جديدة
+                const finalImg = img ? img : data[oldDept][index].img;
 
-            if (resultsHTML) {
-                resultsDiv.innerHTML = resultsHTML;
-                resultsDiv.classList.remove('hidden');
+                data[oldDept][index] = { name, phone, info, img: finalImg };
+                resetForm();
+                updateUI();
             } else {
-                resultsDiv.innerHTML = '<p class="text-slate-400 text-xs text-center col-span-full py-2">❌ عذراً، لا يوجد أي شخص يطابق بيانات البحث المكتوبة.</p>';
-                resultsDiv.classList.remove('hidden');
+                // وضع الإضافة الجديدة
+                const dept = document.getElementById('dept-select').value;
+                if (!dept) { alert('الرجاء اختيار القسم التابع له الشخص.'); return; }
+                
+                data[dept].push({ name, phone, info, img });
+                resetForm();
+                updateUI();
             }
         }
 
-        // إضافة قسم جديد للهيكل
+        // تفعيل وضع التعديل وملء الاستمارة بالبيانات القديمة لشخص معين
+        function editPerson(deptName, index) {
+            const person = data[deptName][index];
+            
+            document.getElementById('form-title').innerText = `✏️ تعديل بيانات: ${person.name}`;
+            document.getElementById('person-name-input').value = person.name;
+            document.getElementById('person-phone-input').value = person.phone;
+            document.getElementById('person-info-input').value = person.info;
+            document.getElementById('person-img-base64').value = ""; // يتم تصفيرها استعداداً لأي صورة جديدة
+            
+            document.getElementById('edit-mode').value = "true";
+            document.getElementById('edit-dept').value = deptName;
+            document.getElementById('edit-index').value = index;
+
+            document.getElementById('dept-select-container').classList.add('hidden'); // إخفاء اختيار القسم أثناء التعديل لضمان ثبات الهيكلية
+            document.getElementById('cancel-edit-btn').classList.remove('hidden');
+            document.getElementById('submit-btn').innerText = "حفظ التغييرات المحدثة";
+            document.getElementById('submit-btn').className = "bg-amber-600 hover:bg-amber-700 text-white font-medium px-8 py-2.5 rounded-xl shadow-md cursor-pointer whitespace-nowrap";
+            
+            window.scrollTo({ top: 300, behavior: 'smooth' });
+        }
+
+        function resetForm() {
+            document.getElementById('form-title').innerText = "👤 استمارة تسجيل شخص جديد";
+            document.getElementById('person-name-input').value = '';
+            document.getElementById('person-phone-input').value = '';
+            document.getElementById('person-info-input').value = '';
+            document.getElementById('person-img-file').value = '';
+            document.getElementById('person-img-base64').value = '';
+            
+            document.getElementById('edit-mode').value = "false";
+            document.getElementById('edit-dept').value = "";
+            document.getElementById('edit-index').value = "";
+
+            document.getElementById('dept-select-container').classList.remove('hidden');
+            document.getElementById('cancel-edit-btn').classList.add('hidden');
+            document.getElementById('submit-btn').innerText = "تأكيد الإدخال";
+            document.getElementById('submit-btn').className = "bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-8 py-2.5 rounded-xl shadow-md cursor-pointer whitespace-nowrap";
+        }
+
+        // توليد وتحميل الـ PDF بصورة فورية
+        function downloadPDF(deptName, index) {
+            const person = data[deptName][index];
+            
+            // تعبئة قالب الـ PDF المخفي بالمعلومات الصحيحة
+            document.getElementById('pdf-name').innerText = person.name;
+            document.getElementById('pdf-phone').innerText = person.phone;
+            document.getElementById('pdf-info').innerText = person.info ? person.info : "لا توجد معلومات إضافية";
+            document.getElementById('pdf-dept').innerText = `قسم: ${deptName}`;
+            document.getElementById('pdf-img').src = person.img ? person.img : defaultAvatar;
+
+            const element = document.getElementById('pdf-template');
+            element.classList.remove('hidden'); // إظهاره مؤقتاً للمكتبة
+
+            // إعدادات تصدير ملف الـ PDF
+            const opt = {
+                margin:       10,
+                filename:     `معلومات_${person.name}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // تشغيل محرك توليد وتحميل الملف
+            html2pdf().set(opt).from(element).save().then(() => {
+                element.classList.add('hidden'); // إعادة إخفائه بعد اكتمال التحميل بنجاح
+            });
+        }
+
         function addDepartment() {
             const input = document.getElementById('dept-name-input');
             const name = input.value.trim();
@@ -268,49 +345,53 @@
                 data[name] = [];
                 input.value = '';
                 updateUI();
-            } else if(data[name]) {
-                alert('هذا القسم تم إنشاؤه مسبقاً!');
-            } else {
-                alert('الرجاء كتابة اسم القسم أولاً.');
-            }
+            } else if(data[name]) { alert('القسم موجود بالفعل!'); }
         }
 
-        // مسح قسم بالكامل مع محتوياته
         function deleteDepartment(deptName) {
-            if (confirm(`تحذير أمني: هل أنت متأكد من مسح قسم "${deptName}" نهائياً وحذف جميع الأشخاص التابعين له؟`)) {
+            if (confirm(`هل أنت متأكد من مسح قسم "${deptName}" بالكامل؟`)) {
                 delete data[deptName];
+                if (document.getElementById('edit-mode').value === "true" && document.getElementById('edit-dept').value === deptName) {
+                    resetForm();
+                }
                 updateUI();
             }
         }
 
-        // إضافة وإدراج شخص جديد للقسم المختار
-        function addPerson() {
-            const name = document.getElementById('person-name-input').value.trim();
-            const phone = document.getElementById('person-phone-input').value.trim();
-            const info = document.getElementById('person-info-input').value.trim();
-            const img = document.getElementById('person-img-input').value.trim();
-            const dept = document.getElementById('dept-select').value;
-
-            if (name && phone && dept) {
-                data[dept].push({ name, phone, info, img });
-                
-                // تصفير الخانات فوراً لتسهيل إدخال الشخص التالي
-                document.getElementById('person-name-input').value = '';
-                document.getElementById('person-phone-input').value = '';
-                document.getElementById('person-info-input').value = '';
-                document.getElementById('person-img-input').value = '';
-                updateUI();
-            } else {
-                alert('خطأ في البيانات: يرجى التأكد من كتابة (الاسم، رقم الهاتف، مع تحديد القسم التابع له الشخص).');
-            }
-        }
-
-        // حذف شخص محدد من قسم معين
         function removePerson(deptName, index) {
-            if (confirm("هل أنت متأكد من حذف هذا الشخص من النظام؟")) {
+            if (confirm("هل تريد بالتأكيد إزالة هذا الشخص؟")) {
                 data[deptName].splice(index, 1);
+                if (document.getElementById('edit-mode').value === "true" && document.getElementById('edit-index').value == index && document.getElementById('edit-dept').value === deptName) {
+                    resetForm();
+                }
                 updateUI();
             }
+        }
+
+        function searchPeople() {
+            const query = document.getElementById('search-input').value.trim().toLowerCase();
+            const resultsDiv = document.getElementById('search-results');
+            if (!query) { resultsDiv.classList.add('hidden'); return; }
+            let resultsHTML = '';
+            for (const [deptName, people] of Object.entries(data)) {
+                people.forEach((p, index) => {
+                    if (p.name.toLowerCase().includes(query) || p.phone.includes(query)) {
+                        resultsHTML += `
+                            <div class="flex items-center justify-between p-3 bg-white rounded-xl border border-indigo-100 shadow-sm">
+                                <div class="flex items-center gap-3">
+                                    <img src="${p.img || defaultAvatar}" class="w-10 h-10 rounded-lg object-cover">
+                                    <div>
+                                        <h5 class="font-bold text-xs text-slate-900">${p.name} <span class="text-[10px] text-slate-400">(${deptName})</span></h5>
+                                        <p class="text-[11px] text-slate-500">${p.phone}</p>
+                                    </div>
+                                </div>
+                                <button onclick="downloadPDF('${deptName}', ${index})" class="text-xs text-indigo-600 hover:underline cursor-pointer">PDF 📄</button>
+                            </div>`;
+                    }
+                });
+            }
+            if (resultsHTML) { resultsDiv.innerHTML = resultsHTML; resultsDiv.classList.remove('hidden'); }
+            else { resultsDiv.innerHTML = '<p class="text-slate-400 text-xs text-center col-span-full">❌ لا توجد نتائج للبحث.</p>'; resultsDiv.classList.remove('hidden'); }
         }
     </script>
 </body>
